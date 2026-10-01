@@ -1,0 +1,52 @@
+[
+  {
+    "variant": "full",
+    "name": "Full (EITE+NIG+DTAG+PRAP+DCT+CTBA+IC)",
+    "seed": 0,
+    "soc_rmse": 0.00717118801549077,
+    "soc_mae": 0.0032907743006944656,
+    "soh_rmse": 0.011964168399572372,
+    "soh_mae": 0.006959176156669855,
+    "elapsed_sec": 1640.8882558345795
+  },
+  {
+    "variant": "full",
+    "name": "Full (EITE+NIG+DTAG+PRAP+DCT+CTBA+IC)",
+    "seed": 1,
+    "soc_rmse": 0.006754022091627121,
+    "soc_mae": 0.003310499247163534,
+    "soh_rmse": 0.011708281934261322,
+    "soh_mae": 0.006788549479097128,
+    "elapsed_sec": 1552.1751070022583
+  },
+  {
+    "variant": "full",
+    "name": "Full (EITE+NIG+DTAG+PRAP+DCT+CTBA+IC)",
+    "seed": 2,
+    "soc_rmse": 0.006454966031014919,
+    "soc_mae": 0.003161872271448374,
+    "soh_rmse": 0.01122695580124855,
+    "soh_mae": 0.006738796830177307,
+    "elapsed_sec": 1545.4549684524536
+  },
+  {
+    "variant": "full",
+    "name": "Full (EITE+NIG+DTAG+PRAP+DCT+CTBA+IC)",
+    "seed": 3,
+    "soc_rmse": 0.007190520875155926,
+    "soc_mae": 0.003274895716458559,
+    "soh_rmse": 0.011829094029963017,
+    "soh_mae": 0.0069434926845133305,
+    "elapsed_sec": 1539.8707602024078
+  },
+  {
+    "variant": "full",
+    "name": "Full (EITE+NIG+DTAG+PRAP+DCT+CTBA+IC)",
+    "seed": 4,
+    "soc_rmse": 0.006674175150692463,
+    "soc_mae": 0.0034646294079720974,
+    "soh_rmse": 0.012280607596039772,
+    "soh_mae": 0.007222066633403301,
+    "elapsed_sec": 1527.0490119457245
+  }
+]

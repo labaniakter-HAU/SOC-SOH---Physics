@@ -1,0 +1,22 @@
+
+============================================================
+  [no_ic] seed=3  epochs=200  train_n=26122  test_n=5726
+============================================================
+  [no_ic seed=3] epoch 1/200  loss=2.085686
+  [no_ic seed=3] epoch 50/200  loss=0.002565
+  [no_ic seed=3] epoch 100/200  loss=0.001063
+  [no_ic seed=3] epoch 150/200  loss=0.000522
+  [no_ic seed=3] epoch 200/200  loss=0.000367
+  [no_ic seed=3] DONE in 4543.9s | SOC RMSE=0.758%  SOH RMSE=1.259%
+
+============================================================
+  [no_ic] seed=4  epochs=200  train_n=26122  test_n=5726
+============================================================
+  [no_ic seed=4] epoch 1/200  loss=4.265091
+  [no_ic seed=4] epoch 50/200  loss=0.002031
+  [no_ic seed=4] epoch 100/200  loss=0.000911
+  [no_ic seed=4] epoch 150/200  loss=0.000355
+  [no_ic seed=4] epoch 200/200  loss=0.000230
+  [no_ic seed=4] DONE in 4461.7s | SOC RMSE=0.596%  SOH RMSE=1.301%
+
+Saved 2 run(s) to results/revision/ablation_s34/no_ic.json

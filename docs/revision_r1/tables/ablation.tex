@@ -1,0 +1,15 @@
+\begin{tabular}{lcccccc}
+\toprule
+Variant & SOC RMSE (\%) & SOH RMSE (\%) & Seeds ($n$) & $p$ (SOC) & $p$ (SOH) \\
+\midrule
+Full & 0.685 $\pm$ 0.032 & 1.180 $\pm$ 0.039 & 5 & -- & -- \\
+No EITE & 0.912 $\pm$ 0.108 & 1.865 $\pm$ 0.183 & 5 & 0.006 & 0.001 \\
+Scalar MSE head & 0.668 $\pm$ 0.125 & 1.194 $\pm$ 0.097 & 5 & 0.763 & 0.733 \\
+Shared representation & 1.683 $\pm$ 0.112 & 2.443 $\pm$ 0.332 & 5 & $<$0.001 & 0.001 \\
+No PRAP & 0.693 $\pm$ 0.072 & 1.197 $\pm$ 0.064 & 5 & 0.792 & 0.660 \\
+No DCT & 0.637 $\pm$ 0.077 & 1.133 $\pm$ 0.084 & 5 & 0.292 & 0.291 \\
+No CTBA & 1.073 $\pm$ 0.080 & 1.919 $\pm$ 0.158 & 5 & $<$0.001 & $<$0.001 \\
+CTBA self-projection (parameter-matched) & 0.692 $\pm$ 0.042 & 1.204 $\pm$ 0.039 & 5 & 0.827 & 0.473 \\
+No IC-inspired proxy & 0.678 $\pm$ 0.060 & 1.237 $\pm$ 0.072 & 5 & 0.782 & 0.205 \\
+\bottomrule
+\end{tabular}

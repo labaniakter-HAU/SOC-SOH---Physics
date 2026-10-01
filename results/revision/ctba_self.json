@@ -1,0 +1,52 @@
+[
+  {
+    "variant": "ctba_self",
+    "name": "CTBA self-projection (parameter-matched, no cross-task flow)",
+    "seed": 0,
+    "soc_rmse": 0.006899085361510515,
+    "soc_mae": 0.003175383433699608,
+    "soh_rmse": 0.011714340187609196,
+    "soh_mae": 0.0068751792423427105,
+    "elapsed_sec": 2782.3873744010925
+  },
+  {
+    "variant": "ctba_self",
+    "name": "CTBA self-projection (parameter-matched, no cross-task flow)",
+    "seed": 1,
+    "soc_rmse": 0.007455684244632721,
+    "soc_mae": 0.00327204167842865,
+    "soh_rmse": 0.011614236049354076,
+    "soh_mae": 0.0066057490184903145,
+    "elapsed_sec": 3125.85684466362
+  },
+  {
+    "variant": "ctba_self",
+    "name": "CTBA self-projection (parameter-matched, no cross-task flow)",
+    "seed": 2,
+    "soc_rmse": 0.006867548916488886,
+    "soc_mae": 0.0033609538804739714,
+    "soh_rmse": 0.012498200871050358,
+    "soh_mae": 0.00724987406283617,
+    "elapsed_sec": 1507.5974535942078
+  },
+  {
+    "variant": "ctba_self",
+    "name": "CTBA self-projection (parameter-matched, no cross-task flow)",
+    "seed": 3,
+    "soc_rmse": 0.006301535293459892,
+    "soc_mae": 0.0031030240934342146,
+    "soh_rmse": 0.012360852211713791,
+    "soh_mae": 0.007586169056594372,
+    "elapsed_sec": 4548.7181215286255
+  },
+  {
+    "variant": "ctba_self",
+    "name": "CTBA self-projection (parameter-matched, no cross-task flow)",
+    "seed": 4,
+    "soc_rmse": 0.007056561764329672,
+    "soc_mae": 0.0034232737962156534,
+    "soh_rmse": 0.011998256668448448,
+    "soh_mae": 0.006981520913541317,
+    "elapsed_sec": 3032.1141328811646
+  }
+]

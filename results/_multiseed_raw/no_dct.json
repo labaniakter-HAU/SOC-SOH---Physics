@@ -1,0 +1,52 @@
+[
+  {
+    "variant": "no_dct",
+    "name": "No-DCT (no chemistry token)",
+    "seed": 0,
+    "soc_rmse": 0.006636988837271929,
+    "soc_mae": 0.003291645087301731,
+    "soh_rmse": 0.010698022320866585,
+    "soh_mae": 0.006485865451395512,
+    "elapsed_sec": 1576.7030863761902
+  },
+  {
+    "variant": "no_dct",
+    "name": "No-DCT (no chemistry token)",
+    "seed": 1,
+    "soc_rmse": 0.007445804309099913,
+    "soc_mae": 0.003618903923779726,
+    "soh_rmse": 0.012589872814714909,
+    "soh_mae": 0.007143684662878513,
+    "elapsed_sec": 1575.8041968345642
+  },
+  {
+    "variant": "no_dct",
+    "name": "No-DCT (no chemistry token)",
+    "seed": 2,
+    "soc_rmse": 0.005913483910262585,
+    "soc_mae": 0.0030747107230126858,
+    "soh_rmse": 0.010928582400083542,
+    "soh_mae": 0.006645553279668093,
+    "elapsed_sec": 1576.848807811737
+  },
+  {
+    "variant": "no_dct",
+    "name": "No-DCT (no chemistry token)",
+    "seed": 3,
+    "soc_rmse": 0.00541300605982542,
+    "soc_mae": 0.002854157006368041,
+    "soh_rmse": 0.01065011601895094,
+    "soh_mae": 0.006563747767359018,
+    "elapsed_sec": 4683.752936840057
+  },
+  {
+    "variant": "no_dct",
+    "name": "No-DCT (no chemistry token)",
+    "seed": 4,
+    "soc_rmse": 0.006441848818212748,
+    "soc_mae": 0.0033965592738240957,
+    "soh_rmse": 0.011791681870818138,
+    "soh_mae": 0.007143617607653141,
+    "elapsed_sec": 4416.99521279335
+  }
+]

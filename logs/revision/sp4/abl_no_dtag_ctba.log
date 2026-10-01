@@ -1,0 +1,22 @@
+
+============================================================
+  [no_dtag_ctba] seed=3  epochs=200  train_n=26122  test_n=5726
+============================================================
+  [no_dtag_ctba seed=3] epoch 1/200  loss=6.056181
+  [no_dtag_ctba seed=3] epoch 50/200  loss=0.002626
+  [no_dtag_ctba seed=3] epoch 100/200  loss=0.000846
+  [no_dtag_ctba seed=3] epoch 150/200  loss=0.000445
+  [no_dtag_ctba seed=3] epoch 200/200  loss=0.000323
+  [no_dtag_ctba seed=3] DONE in 3426.7s | SOC RMSE=1.681%  SOH RMSE=2.834%
+
+============================================================
+  [no_dtag_ctba] seed=4  epochs=200  train_n=26122  test_n=5726
+============================================================
+  [no_dtag_ctba seed=4] epoch 1/200  loss=4.181108
+  [no_dtag_ctba seed=4] epoch 50/200  loss=0.002499
+  [no_dtag_ctba seed=4] epoch 100/200  loss=0.002516
+  [no_dtag_ctba seed=4] epoch 150/200  loss=0.000426
+  [no_dtag_ctba seed=4] epoch 200/200  loss=0.000299
+  [no_dtag_ctba seed=4] DONE in 3519.3s | SOC RMSE=1.515%  SOH RMSE=2.093%
+
+Saved 2 run(s) to results/revision/ablation_s34/no_dtag_ctba.json

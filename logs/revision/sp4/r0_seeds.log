@@ -1,0 +1,6 @@
+canonical files reproduced
+wrote results/revision/seeds/r0_sensitivity_s0.json {'-30%': 6.664, '-20%': 4.607, '-10%': 2.741, '0% (baseline)': 0.717, '+10%': 3.657, '+20%': 6.102, '+30%': 8.11}
+wrote results/revision/seeds/r0_sensitivity_s1.json {'-30%': 7.46, '-20%': 4.853, '-10%': 2.829, '0% (baseline)': 0.675, '+10%': 4.002, '+20%': 6.975, '+30%': 9.658}
+wrote results/revision/seeds/r0_sensitivity_s2.json {'-30%': 7.156, '-20%': 5.336, '-10%': 2.858, '0% (baseline)': 0.645, '+10%': 3.845, '+20%': 6.878, '+30%': 9.693}
+wrote results/revision/seeds/r0_sensitivity_s3.json {'-30%': 9.224, '-20%': 5.521, '-10%': 2.863, '0% (baseline)': 0.719, '+10%': 3.812, '+20%': 6.419, '+30%': 8.615}
+wrote results/revision/seeds/r0_sensitivity_s4.json {'-30%': 6.446, '-20%': 4.422, '-10%': 2.633, '0% (baseline)': 0.667, '+10%': 3.605, '+20%': 6.388, '+30%': 9.032}

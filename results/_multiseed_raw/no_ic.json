@@ -1,0 +1,52 @@
+[
+  {
+    "variant": "no_ic",
+    "name": "No-IC (no incremental capacity branch)",
+    "seed": 0,
+    "soc_rmse": 0.006809046026319265,
+    "soc_mae": 0.0031927661038935184,
+    "soh_rmse": 0.011779764667153358,
+    "soh_mae": 0.006956037133932114,
+    "elapsed_sec": 1477.5603013038635
+  },
+  {
+    "variant": "no_ic",
+    "name": "No-IC (no incremental capacity branch)",
+    "seed": 1,
+    "soc_rmse": 0.006534153129905462,
+    "soc_mae": 0.0032433788292109966,
+    "soh_rmse": 0.011444543488323689,
+    "soh_mae": 0.006633342709392309,
+    "elapsed_sec": 1476.8665654659271
+  },
+  {
+    "variant": "no_ic",
+    "name": "No-IC (no incremental capacity branch)",
+    "seed": 2,
+    "soc_rmse": 0.007009092252701521,
+    "soc_mae": 0.0035074742045253515,
+    "soh_rmse": 0.013009599409997463,
+    "soh_mae": 0.007395511027425528,
+    "elapsed_sec": 1478.2238383293152
+  },
+  {
+    "variant": "no_ic",
+    "name": "No-IC (no incremental capacity branch)",
+    "seed": 3,
+    "soc_rmse": 0.007582548540085554,
+    "soc_mae": 0.003658851608633995,
+    "soh_rmse": 0.012590122409164906,
+    "soh_mae": 0.007581596728414297,
+    "elapsed_sec": 4543.859239578247
+  },
+  {
+    "variant": "no_ic",
+    "name": "No-IC (no incremental capacity branch)",
+    "seed": 4,
+    "soc_rmse": 0.0059577408246695995,
+    "soc_mae": 0.0034945281222462654,
+    "soh_rmse": 0.013009821064770222,
+    "soh_mae": 0.007523648906499147,
+    "elapsed_sec": 4461.723077297211
+  }
+]

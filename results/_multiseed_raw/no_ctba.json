@@ -1,0 +1,52 @@
+[
+  {
+    "variant": "no_ctba",
+    "name": "No-CTBA (no cross-task attention)",
+    "seed": 0,
+    "soc_rmse": 0.009818397462368011,
+    "soc_mae": 0.006908017210662365,
+    "soh_rmse": 0.0168282650411129,
+    "soh_mae": 0.01304735615849495,
+    "elapsed_sec": 1552.1608555316925
+  },
+  {
+    "variant": "no_ctba",
+    "name": "No-CTBA (no cross-task attention)",
+    "seed": 1,
+    "soc_rmse": 0.010012407787144184,
+    "soc_mae": 0.007510161492973566,
+    "soh_rmse": 0.020137876272201538,
+    "soh_mae": 0.01572011597454548,
+    "elapsed_sec": 1550.4949102401733
+  },
+  {
+    "variant": "no_ctba",
+    "name": "No-CTBA (no cross-task attention)",
+    "seed": 2,
+    "soc_rmse": 0.011695506982505322,
+    "soc_mae": 0.008575609885156155,
+    "soh_rmse": 0.01866605505347252,
+    "soh_mae": 0.01402003038674593,
+    "elapsed_sec": 1492.0515835285187
+  },
+  {
+    "variant": "no_ctba",
+    "name": "No-CTBA (no cross-task attention)",
+    "seed": 3,
+    "soc_rmse": 0.011262877844274044,
+    "soc_mae": 0.008271325379610062,
+    "soh_rmse": 0.02096783183515072,
+    "soh_mae": 0.01595405861735344,
+    "elapsed_sec": 3823.471902370453
+  },
+  {
+    "variant": "no_ctba",
+    "name": "No-CTBA (no cross-task attention)",
+    "seed": 4,
+    "soc_rmse": 0.010879048146307468,
+    "soc_mae": 0.007996325381100178,
+    "soh_rmse": 0.019352082163095474,
+    "soh_mae": 0.01491835992783308,
+    "elapsed_sec": 3888.015060186386
+  }
+]

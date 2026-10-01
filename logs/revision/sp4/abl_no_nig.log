@@ -1,0 +1,22 @@
+
+============================================================
+  [no_nig] seed=3  epochs=200  train_n=26122  test_n=5726
+============================================================
+  [no_nig seed=3] epoch 1/200  loss=5.364596
+  [no_nig seed=3] epoch 50/200  loss=0.002228
+  [no_nig seed=3] epoch 100/200  loss=0.000823
+  [no_nig seed=3] epoch 150/200  loss=0.000424
+  [no_nig seed=3] epoch 200/200  loss=0.000278
+  [no_nig seed=3] DONE in 4441.4s | SOC RMSE=0.590%  SOH RMSE=1.112%
+
+============================================================
+  [no_nig] seed=4  epochs=200  train_n=26122  test_n=5726
+============================================================
+  [no_nig seed=4] epoch 1/200  loss=4.060702
+  [no_nig seed=4] epoch 50/200  loss=0.001618
+  [no_nig seed=4] epoch 100/200  loss=0.000810
+  [no_nig seed=4] epoch 150/200  loss=0.000427
+  [no_nig seed=4] epoch 200/200  loss=0.000294
+  [no_nig seed=4] DONE in 4934.1s | SOC RMSE=0.700%  SOH RMSE=1.212%
+
+Saved 2 run(s) to results/revision/ablation_s34/no_nig.json

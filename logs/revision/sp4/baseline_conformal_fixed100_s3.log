@@ -1,0 +1,5 @@
+B0005 {'uapi_former': (70.9, 49.8, 0.0), 'cnn_bilstm': (84.6, 85.3, 0.0), 'pi_transformer': (89.4, 92.9, 0.0)}
+B0006 {'uapi_former': (38.0, 30.2, 0.0), 'cnn_bilstm': (60.1, 58.7, 0.0), 'pi_transformer': (57.3, 51.5, 0.0)}
+B0007 {'uapi_former': (76.3, 80.1, 19.7), 'cnn_bilstm': (92.9, 92.1, 0.0), 'pi_transformer': (81.3, 75.3, 0.0)}
+B0018 {'uapi_former': (45.3, 59.3, 0.0), 'cnn_bilstm': (59.3, 62.5, 0.0), 'pi_transformer': (80.6, 83.8, 0.0)}
+wrote results/revision/sensitivity/baseline_conformal_fixed100_s3.json

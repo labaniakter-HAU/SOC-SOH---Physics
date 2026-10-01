@@ -1,0 +1,22 @@
+
+============================================================
+  [no_eite] seed=3  epochs=200  train_n=26122  test_n=5726
+============================================================
+  [no_eite seed=3] epoch 1/200  loss=3.044632
+  [no_eite seed=3] epoch 50/200  loss=0.002539
+  [no_eite seed=3] epoch 100/200  loss=0.001470
+  [no_eite seed=3] epoch 150/200  loss=0.000886
+  [no_eite seed=3] epoch 200/200  loss=0.000526
+  [no_eite seed=3] DONE in 3577.5s | SOC RMSE=0.881%  SOH RMSE=1.740%
+
+============================================================
+  [no_eite] seed=4  epochs=200  train_n=26122  test_n=5726
+============================================================
+  [no_eite seed=4] epoch 1/200  loss=4.504535
+  [no_eite seed=4] epoch 50/200  loss=0.003276
+  [no_eite seed=4] epoch 100/200  loss=0.001425
+  [no_eite seed=4] epoch 150/200  loss=0.000702
+  [no_eite seed=4] epoch 200/200  loss=0.000460
+  [no_eite seed=4] DONE in 4697.8s | SOC RMSE=0.895%  SOH RMSE=1.791%
+
+Saved 2 run(s) to results/revision/ablation_s34/no_eite.json

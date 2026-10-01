@@ -1,0 +1,7 @@
+calce {'zero_shot': (43.06, 1.033, 99.999), 'eot': (15.33, 2.742, 99.988)}
+oxford {'zero_shot': (36.64, 0.721, 100.0), 'eot': (5.84, 2.074, 62.444)}
+mit_tri {'zero_shot': (64.8, 0.408, 100.0), 'eot': (50.97, 0.442, 100.0)}
+calce FT 6.99 89.16 16.91
+oxford FT 0.54 84.69 1.57
+mit_tri FT 14.21 89.04 4.04
+wrote results/revision/seeds/chemistry_coverage_s0.json

@@ -1,0 +1,52 @@
+[
+  {
+    "variant": "no_dtag_ctba",
+    "name": "No-DTAG+CTBA (shared rep, no cross-task attn)",
+    "seed": 0,
+    "soc_rmse": 0.01810332015156746,
+    "soc_mae": 0.013959962874650955,
+    "soh_rmse": 0.02759593352675438,
+    "soh_mae": 0.025265153497457504,
+    "elapsed_sec": 1454.1023619174957
+  },
+  {
+    "variant": "no_dtag_ctba",
+    "name": "No-DTAG+CTBA (shared rep, no cross-task attn)",
+    "seed": 1,
+    "soc_rmse": 0.016562866047024727,
+    "soc_mae": 0.013013915158808231,
+    "soh_rmse": 0.02243013307452202,
+    "soh_mae": 0.019439881667494774,
+    "elapsed_sec": 1452.131540775299
+  },
+  {
+    "variant": "no_dtag_ctba",
+    "name": "No-DTAG+CTBA (shared rep, no cross-task attn)",
+    "seed": 2,
+    "soc_rmse": 0.017537491396069527,
+    "soc_mae": 0.013461660593748093,
+    "soh_rmse": 0.02283436991274357,
+    "soh_mae": 0.01962696947157383,
+    "elapsed_sec": 1452.7426602840424
+  },
+  {
+    "variant": "no_dtag_ctba",
+    "name": "No-DTAG+CTBA (shared rep, no cross-task attn)",
+    "seed": 3,
+    "soc_rmse": 0.016812069341540337,
+    "soc_mae": 0.013258100487291813,
+    "soh_rmse": 0.02834337018430233,
+    "soh_mae": 0.02580432780086994,
+    "elapsed_sec": 3426.6931054592133
+  },
+  {
+    "variant": "no_dtag_ctba",
+    "name": "No-DTAG+CTBA (shared rep, no cross-task attn)",
+    "seed": 4,
+    "soc_rmse": 0.01515182200819254,
+    "soc_mae": 0.01181813981384039,
+    "soh_rmse": 0.020933642983436584,
+    "soh_mae": 0.017744995653629303,
+    "elapsed_sec": 3519.2587134838104
+  }
+]

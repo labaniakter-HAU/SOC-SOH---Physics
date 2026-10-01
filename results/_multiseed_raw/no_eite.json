@@ -1,0 +1,52 @@
+[
+  {
+    "variant": "no_eite",
+    "name": "No-EITE (SPMe channels zeroed)",
+    "seed": 0,
+    "soc_rmse": 0.009877201169729233,
+    "soc_mae": 0.005078993737697601,
+    "soh_rmse": 0.018383760005235672,
+    "soh_mae": 0.010962910018861294,
+    "elapsed_sec": 1518.592175245285
+  },
+  {
+    "variant": "no_eite",
+    "name": "No-EITE (SPMe channels zeroed)",
+    "seed": 1,
+    "soc_rmse": 0.010388953611254692,
+    "soc_mae": 0.0052159507758915424,
+    "soh_rmse": 0.021860290318727493,
+    "soh_mae": 0.01212091464549303,
+    "elapsed_sec": 1513.0102455615997
+  },
+  {
+    "variant": "no_eite",
+    "name": "No-EITE (SPMe channels zeroed)",
+    "seed": 2,
+    "soc_rmse": 0.00757029140368104,
+    "soc_mae": 0.004093878902494907,
+    "soh_rmse": 0.01771356724202633,
+    "soh_mae": 0.010299405083060265,
+    "elapsed_sec": 1513.5889081954956
+  },
+  {
+    "variant": "no_eite",
+    "name": "No-EITE (SPMe channels zeroed)",
+    "seed": 3,
+    "soc_rmse": 0.008810199797153473,
+    "soc_mae": 0.004586419090628624,
+    "soh_rmse": 0.017401454970240593,
+    "soh_mae": 0.01039690338075161,
+    "elapsed_sec": 3577.4851644039154
+  },
+  {
+    "variant": "no_eite",
+    "name": "No-EITE (SPMe channels zeroed)",
+    "seed": 4,
+    "soc_rmse": 0.008953569456934929,
+    "soc_mae": 0.004455906338989735,
+    "soh_rmse": 0.017911769449710846,
+    "soh_mae": 0.010421269573271275,
+    "elapsed_sec": 4697.828962564468
+  }
+]

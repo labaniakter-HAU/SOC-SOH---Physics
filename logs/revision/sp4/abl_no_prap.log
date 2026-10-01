@@ -1,0 +1,22 @@
+
+============================================================
+  [no_prap] seed=3  epochs=200  train_n=26122  test_n=5726
+============================================================
+  [no_prap seed=3] epoch 1/200  loss=3.140203
+  [no_prap seed=3] epoch 50/200  loss=0.001643
+  [no_prap seed=3] epoch 100/200  loss=0.000737
+  [no_prap seed=3] epoch 150/200  loss=0.000457
+  [no_prap seed=3] epoch 200/200  loss=0.000256
+  [no_prap seed=3] DONE in 4674.5s | SOC RMSE=0.743%  SOH RMSE=1.254%
+
+============================================================
+  [no_prap] seed=4  epochs=200  train_n=26122  test_n=5726
+============================================================
+  [no_prap seed=4] epoch 1/200  loss=4.602534
+  [no_prap seed=4] epoch 50/200  loss=0.001737
+  [no_prap seed=4] epoch 100/200  loss=0.000772
+  [no_prap seed=4] epoch 150/200  loss=0.000379
+  [no_prap seed=4] epoch 200/200  loss=0.000256
+  [no_prap seed=4] DONE in 4610.9s | SOC RMSE=0.626%  SOH RMSE=1.150%
+
+Saved 2 run(s) to results/revision/ablation_s34/no_prap.json

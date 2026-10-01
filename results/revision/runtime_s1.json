@@ -1,0 +1,26 @@
+{
+  "cpu": "AMD64 Family 25 Model 97 Stepping 2, AuthenticAMD",
+  "threads": 6,
+  "fold": "clean LOCO, seed 0, B0005 (results/revision/cache/loco_clean_s0_B0005.pt)",
+  "n_cal": 1061,
+  "n_target_batch": 5008,
+  "s1_discriminator_fit_s": {
+    "mean": 1.2427517400006765,
+    "max": 2.432513299980201
+  },
+  "s1_per_window_ms": {
+    "mean": 0.054382049944251776,
+    "p95": 0.06089999806135893,
+    "max": 1.721299980999902
+  },
+  "s0_per_window_ms": {
+    "mean": 0.0001122999528888613
+  },
+  "s2_batch_weights_s": {
+    "mean": 0.014067739993333817
+  },
+  "machine_load_pct_before": 4,
+  "machine_load_pct_after": 7,
+  "other_jobs_running": 0,
+  "session": "R2.9 idle-window session: backbone benchmark then calibration stages, same process environment"
+}

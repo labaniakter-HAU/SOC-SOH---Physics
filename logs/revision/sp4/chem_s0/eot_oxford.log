@@ -1,0 +1,14 @@
+Device: cuda
+Loaded frozen backbone: checkpoints/nasa_v12_seed0/best.pt
+
+=== OXFORD ===  caching latents (frozen backbone)
+  src=26122 train=10821 val=2293 test=2218
+  variant=none   VAL soc_rmse=5.90%  soh_rmse=11.29%
+  variant=grad   VAL soc_rmse=35.62%  soh_rmse=13.17%
+  variant=peak   VAL soc_rmse=7.46%  soh_rmse=8.14%
+  variant=dist   VAL soc_rmse=6.81%  soh_rmse=9.73%
+  SELECTED variant=none  TEST soc_rmse=5.84% soh_rmse=10.22%  (zero-shot 36.64%, fine-tuned 0.54%)
+  saved transducer -> checkpoints/sp4/eot_transducer_s0_oxford.pt
+t-SNE figure saved -> C:\Users\renuv\Paper B\figures\eot_alignment_oxford.pdf
+
+Results saved -> results/revision/seeds/eot_transfer_s0.json

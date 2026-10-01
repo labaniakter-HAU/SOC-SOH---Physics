@@ -1,0 +1,20 @@
+{
+  "torch": "2.11.0+cu128",
+  "method": "torch.save(state_dict) into memory; INT8 = quantize_dynamic({nn.Linear}, qint8)",
+  "checkpoints/nasa_v12/best.pt": {
+    "n_params": 1103112,
+    "fp32_bytes": 4547456,
+    "int8_bytes": 2466145,
+    "fp32_mb": 4.547456,
+    "int8_mb": 2.466145,
+    "ratio": 0.5423131086919808
+  },
+  "checkpoints/nasa_v12_nig/best_calibrated.pt": {
+    "n_params": 1103112,
+    "fp32_bytes": 4547456,
+    "int8_bytes": 2466145,
+    "fp32_mb": 4.547456,
+    "int8_mb": 2.466145,
+    "ratio": 0.5423131086919808
+  }
+}

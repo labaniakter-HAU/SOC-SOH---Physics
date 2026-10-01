@@ -1,0 +1,52 @@
+[
+  {
+    "variant": "no_prap",
+    "name": "No-PRAP (uniform mean pooling)",
+    "seed": 0,
+    "soc_rmse": 0.006759170908480883,
+    "soc_mae": 0.0033102731686085463,
+    "soh_rmse": 0.011418277397751808,
+    "soh_mae": 0.006993579212576151,
+    "elapsed_sec": 1573.446225643158
+  },
+  {
+    "variant": "no_prap",
+    "name": "No-PRAP (uniform mean pooling)",
+    "seed": 1,
+    "soc_rmse": 0.007897639647126198,
+    "soc_mae": 0.003675532527267933,
+    "soh_rmse": 0.012777392752468586,
+    "soh_mae": 0.007425093092024326,
+    "elapsed_sec": 1593.0666708946228
+  },
+  {
+    "variant": "no_prap",
+    "name": "No-PRAP (uniform mean pooling)",
+    "seed": 2,
+    "soc_rmse": 0.006311909761279821,
+    "soc_mae": 0.0031047388911247253,
+    "soh_rmse": 0.011630929075181484,
+    "soh_mae": 0.007241927552968264,
+    "elapsed_sec": 1609.7211954593658
+  },
+  {
+    "variant": "no_prap",
+    "name": "No-PRAP (uniform mean pooling)",
+    "seed": 3,
+    "soc_rmse": 0.007427608594298363,
+    "soc_mae": 0.0036652216222137213,
+    "soh_rmse": 0.012536543421447277,
+    "soh_mae": 0.007236547768115997,
+    "elapsed_sec": 4674.455021858215
+  },
+  {
+    "variant": "no_prap",
+    "name": "No-PRAP (uniform mean pooling)",
+    "seed": 4,
+    "soc_rmse": 0.00625847140327096,
+    "soc_mae": 0.0033832776825875044,
+    "soh_rmse": 0.011497302912175655,
+    "soh_mae": 0.0069078425876796246,
+    "elapsed_sec": 4610.853525161743
+  }
+]

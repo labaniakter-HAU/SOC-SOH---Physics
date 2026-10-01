@@ -1,0 +1,21 @@
+cff-version: 1.2.0
+message: "If you use this code or these results, please cite the article."
+title: "Diagnosing Conformal Coverage Failure under Battery Deployment Shift for Joint State-of-Charge and State-of-Health Estimation"
+type: software
+authors:
+  - given-names: "Labani"
+    family-names: "Akter"
+    affiliation: "Department of Chemical and Materials Engineering, Huai'an University, Huai'an 223003, China"
+  - given-names: "Yong"
+    family-names: "Yang"
+    email: "yongyang@hau.edu.cn"
+    affiliation: "Department of Chemical and Materials Engineering, Huai'an University, Huai'an 223003, China"
+  - given-names: "Liang"
+    family-names: "Song"
+    affiliation: "Department of Chemical and Materials Engineering, Huai'an University, Huai'an 223003, China"
+  - given-names: "Mohammad Raziul Hasan Rifat"
+    family-names: "Sarkar"
+    affiliation: "Department of Mechanical Engineering, Huai'an University, Huai'an 223003, China"
+repository-code: "https://github.com/labaniakter-HAU/SOC-SOH---Physics"
+version: "1.0"
+date-released: "2026-10-01"

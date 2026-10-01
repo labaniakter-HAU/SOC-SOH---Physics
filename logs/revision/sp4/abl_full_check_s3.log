@@ -1,0 +1,12 @@
+
+============================================================
+  [full] seed=3  epochs=200  train_n=26122  test_n=5726
+============================================================
+  [full seed=3] epoch 1/200  loss=3.156884
+  [full seed=3] epoch 50/200  loss=0.001939
+  [full seed=3] epoch 100/200  loss=0.000842
+  [full seed=3] epoch 150/200  loss=0.000434
+  [full seed=3] epoch 200/200  loss=0.000291
+  [full seed=3] DONE in 3576.7s | SOC RMSE=0.719%  SOH RMSE=1.183%
+
+Saved 1 run(s) to results/revision/ablation_s34/full_check_s3.json

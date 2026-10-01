@@ -1,0 +1,17 @@
+cnn_bilstm_s3_B0005 {'soc_rmse': 3.888, 'soh_rmse': 5.124, 'soc_r': 0.996, 'minutes': 6.923}
+cnn_bilstm_s3_B0006 {'soc_rmse': 7.781, 'soh_rmse': 5.866, 'soc_r': 0.982, 'minutes': 6.894}
+cnn_bilstm_s3_B0007 {'soc_rmse': 2.816, 'soh_rmse': 4.978, 'soc_r': 0.997, 'minutes': 6.878}
+cnn_bilstm_s3_B0018 {'soc_rmse': 9.109, 'soh_rmse': 8.762, 'soc_r': 0.967, 'minutes': 7.557}
+cnn_bilstm_s4_B0005 {'soc_rmse': 3.275, 'soh_rmse': 5.817, 'soc_r': 0.995, 'minutes': 7.075}
+cnn_bilstm_s4_B0006 {'soc_rmse': 7.854, 'soh_rmse': 6.755, 'soc_r': 0.98, 'minutes': 7.105}
+cnn_bilstm_s4_B0007 {'soc_rmse': 3.217, 'soh_rmse': 5.363, 'soc_r': 0.997, 'minutes': 7.051}
+cnn_bilstm_s4_B0018 {'soc_rmse': 9.46, 'soh_rmse': 10.257, 'soc_r': 0.969, 'minutes': 7.454}
+pi_transformer_s3_B0005 {'soc_rmse': 3.162, 'soh_rmse': 7.474, 'soc_r': 0.995, 'minutes': 9.257}
+pi_transformer_s3_B0006 {'soc_rmse': 6.085, 'soh_rmse': 4.69, 'soc_r': 0.995, 'minutes': 9.311}
+pi_transformer_s3_B0007 {'soc_rmse': 3.06, 'soh_rmse': 6.386, 'soc_r': 0.998, 'minutes': 9.313}
+pi_transformer_s3_B0018 {'soc_rmse': 4.541, 'soh_rmse': 6.879, 'soc_r': 0.99, 'minutes': 9.936}
+pi_transformer_s4_B0005 {'soc_rmse': 3.612, 'soh_rmse': 5.768, 'soc_r': 0.993, 'minutes': 9.077}
+pi_transformer_s4_B0006 {'soc_rmse': 6.778, 'soh_rmse': 4.377, 'soc_r': 0.991, 'minutes': 9.086}
+pi_transformer_s4_B0007 {'soc_rmse': 3.178, 'soh_rmse': 6.205, 'soc_r': 0.998, 'minutes': 9.113}
+pi_transformer_s4_B0018 {'soc_rmse': 4.462, 'soh_rmse': 10.112, 'soc_r': 0.99, 'minutes': 9.738}
+wrote results/revision/sensitivity/baselines_loco_fixed100.json

@@ -1,0 +1,14 @@
+Device: cuda
+Loaded frozen backbone: checkpoints/nasa_v12_seed0/best.pt
+
+=== CALCE ===  caching latents (frozen backbone)
+  src=26122 train=224787 val=24375 test=171190
+  variant=none   VAL soc_rmse=17.82%  soh_rmse=14.63%
+  variant=grad   VAL soc_rmse=39.56%  soh_rmse=12.86%
+  variant=peak   VAL soc_rmse=14.97%  soh_rmse=17.79%
+  variant=dist   VAL soc_rmse=14.89%  soh_rmse=16.14%
+  SELECTED variant=dist  TEST soc_rmse=15.33% soh_rmse=16.04%  (zero-shot 43.06%, fine-tuned 6.99%)
+  saved transducer -> checkpoints/sp4/eot_transducer_s0_calce.pt
+t-SNE figure saved -> C:\Users\renuv\Paper B\figures\eot_alignment_calce.pdf
+
+Results saved -> results/revision/seeds/eot_transfer_s0.json

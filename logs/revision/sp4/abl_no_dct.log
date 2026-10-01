@@ -1,0 +1,22 @@
+
+============================================================
+  [no_dct] seed=3  epochs=200  train_n=26122  test_n=5726
+============================================================
+  [no_dct seed=3] epoch 1/200  loss=3.185330
+  [no_dct seed=3] epoch 50/200  loss=0.001687
+  [no_dct seed=3] epoch 100/200  loss=0.000655
+  [no_dct seed=3] epoch 150/200  loss=0.000429
+  [no_dct seed=3] epoch 200/200  loss=0.000230
+  [no_dct seed=3] DONE in 4683.8s | SOC RMSE=0.541%  SOH RMSE=1.065%
+
+============================================================
+  [no_dct] seed=4  epochs=200  train_n=26122  test_n=5726
+============================================================
+  [no_dct seed=4] epoch 1/200  loss=4.510904
+  [no_dct seed=4] epoch 50/200  loss=0.001770
+  [no_dct seed=4] epoch 100/200  loss=0.000769
+  [no_dct seed=4] epoch 150/200  loss=0.000381
+  [no_dct seed=4] epoch 200/200  loss=0.000243
+  [no_dct seed=4] DONE in 4417.0s | SOC RMSE=0.644%  SOH RMSE=1.179%
+
+Saved 2 run(s) to results/revision/ablation_s34/no_dct.json

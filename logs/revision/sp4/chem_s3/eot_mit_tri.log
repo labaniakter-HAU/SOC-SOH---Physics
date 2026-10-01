@@ -1,0 +1,14 @@
+Device: cuda
+Loaded frozen backbone: checkpoints/nasa_v12_seed3/best.pt
+
+=== MIT_TRI ===  caching latents (frozen backbone)
+  src=26122 train=745760 val=84409 test=114742
+  variant=none   VAL soc_rmse=67.91%  soh_rmse=13.92%
+  variant=grad   VAL soc_rmse=60.96%  soh_rmse=24.45%
+  variant=peak   VAL soc_rmse=68.08%  soh_rmse=15.04%
+  variant=dist   VAL soc_rmse=67.86%  soh_rmse=11.18%
+  SELECTED variant=grad  TEST soc_rmse=60.39% soh_rmse=24.50%  (zero-shot 60.22%, fine-tuned 10.35%)
+  saved transducer -> checkpoints/sp4/eot_transducer_s3_mit_tri.pt
+t-SNE figure saved -> C:\Users\renuv\Paper B\figures\eot_alignment_mit_tri.pdf
+
+Results saved -> results/revision/seeds/eot_transfer_s3.json

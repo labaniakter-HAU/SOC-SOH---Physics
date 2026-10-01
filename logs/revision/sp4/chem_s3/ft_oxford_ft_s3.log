@@ -1,0 +1,15 @@
+Oxford dataset: 10821 train, 2293 val samples.
+Model parameters: 1,103,112
+Fine-tuning from checkpoints/nasa_v12_seed3/best.pt — resetting optimizer/scheduler/best_loss
+Epoch    1/100 | train: 0.074987 | val_mse: 0.016671 (~5.3% SOC RMSE) | lr: 5.00e-05
+Epoch   10/100 | train: 0.011446 | val_mse: 0.004276 (~2.7% SOC RMSE) | lr: 4.88e-05
+Epoch   20/100 | train: 0.005679 | val_mse: 0.004018 (~2.6% SOC RMSE) | lr: 4.52e-05
+Epoch   30/100 | train: 0.004285 | val_mse: 0.003876 (~2.5% SOC RMSE) | lr: 3.97e-05
+Epoch   40/100 | train: 0.003638 | val_mse: 0.004461 (~2.7% SOC RMSE) | lr: 3.27e-05
+Epoch   50/100 | train: 0.003140 | val_mse: 0.004421 (~2.7% SOC RMSE) | lr: 2.50e-05
+Epoch   60/100 | train: 0.002732 | val_mse: 0.003006 (~2.2% SOC RMSE) | lr: 1.73e-05
+Epoch   70/100 | train: 0.002533 | val_mse: 0.002986 (~2.2% SOC RMSE) | lr: 1.03e-05
+Epoch   80/100 | train: 0.002401 | val_mse: 0.003138 (~2.3% SOC RMSE) | lr: 4.77e-06
+Epoch   90/100 | train: 0.002315 | val_mse: 0.003543 (~2.4% SOC RMSE) | lr: 1.22e-06
+Epoch  100/100 | train: 0.002312 | val_mse: 0.003385 (~2.4% SOC RMSE) | lr: 0.00e+00
+Training complete. Best loss: 0.002767. Checkpoints in checkpoints/sp4/oxford_ft_s3/

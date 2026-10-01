@@ -1,0 +1,13 @@
+{
+  "seed": 0,
+  "n_test": 2218,
+  "soc_rmse_pct": 0.5369223952293396,
+  "soh_rmse_pct": 3.01523756980896,
+  "soc_r": 0.9998463990278013,
+  "soh_r": 0.9143279714884709,
+  "record": "discharge",
+  "n_test_cells": 1,
+  "n_test_cycles": 76,
+  "n_train": 10821,
+  "n_val": 2293
+}

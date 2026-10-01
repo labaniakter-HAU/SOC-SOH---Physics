@@ -1,0 +1,15 @@
+CALCE dataset (5 cycles/cell few-shot cap): 1178 train, 24375 val samples.
+Model parameters: 1,103,112
+Fine-tuning from checkpoints/nasa_v12_seed2/best.pt — resetting optimizer/scheduler/best_loss
+Epoch    1/100 | train: 0.271413 | val_mse: 0.221001 (~19.2% SOC RMSE) | lr: 1.00e-04
+Epoch   10/100 | train: 0.004244 | val_mse: 0.195994 (~18.1% SOC RMSE) | lr: 9.76e-05
+Epoch   20/100 | train: 0.002714 | val_mse: 0.198175 (~18.2% SOC RMSE) | lr: 9.05e-05
+Epoch   30/100 | train: 0.002323 | val_mse: 0.195304 (~18.0% SOC RMSE) | lr: 7.94e-05
+Epoch   40/100 | train: 0.002172 | val_mse: 0.194778 (~18.0% SOC RMSE) | lr: 6.55e-05
+Epoch   50/100 | train: 0.002044 | val_mse: 0.193391 (~18.0% SOC RMSE) | lr: 5.00e-05
+Epoch   60/100 | train: 0.001906 | val_mse: 0.193225 (~17.9% SOC RMSE) | lr: 3.45e-05
+Epoch   70/100 | train: 0.001814 | val_mse: 0.192586 (~17.9% SOC RMSE) | lr: 2.06e-05
+Epoch   80/100 | train: 0.001752 | val_mse: 0.192639 (~17.9% SOC RMSE) | lr: 9.55e-06
+Epoch   90/100 | train: 0.001853 | val_mse: 0.192578 (~17.9% SOC RMSE) | lr: 2.45e-06
+Epoch  100/100 | train: 0.001784 | val_mse: 0.192531 (~17.9% SOC RMSE) | lr: 0.00e+00
+Training complete. Best loss: 0.178146. Checkpoints in checkpoints/sp4/calce_ft_fewshot5_s2/

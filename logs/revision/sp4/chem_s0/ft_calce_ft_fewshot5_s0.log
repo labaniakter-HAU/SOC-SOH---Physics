@@ -1,0 +1,17 @@
+CALCE dataset (5 cycles/cell few-shot cap): 1178 train, 24375 val samples.
+Model parameters: 1,103,112
+Fine-tuning from checkpoints/nasa_v12_seed0/best.pt — resetting optimizer/scheduler/best_loss
+C:\Users\renuv\Paper B\train.py:267: UserWarning: Detected call of `lr_scheduler.step()` before `optimizer.step()`. In PyTorch 1.1.0 and later, you should call them in the opposite order: `optimizer.step()` before `lr_scheduler.step()`.  Failure to do this will result in PyTorch skipping the first value of the learning rate schedule. See more details at https://pytorch.org/docs/stable/optim.html#how-to-adjust-learning-rate
+  scheduler.step()
+Epoch    1/100 | train: 1.804042 | val_mse: 0.821947 (~37.0% SOC RMSE) | lr: 1.00e-04
+Epoch   10/100 | train: 0.007389 | val_mse: 0.158060 (~16.2% SOC RMSE) | lr: 9.76e-05
+Epoch   20/100 | train: 0.003021 | val_mse: 0.172218 (~16.9% SOC RMSE) | lr: 9.05e-05
+Epoch   30/100 | train: 0.002010 | val_mse: 0.177036 (~17.2% SOC RMSE) | lr: 7.94e-05
+Epoch   40/100 | train: 0.001849 | val_mse: 0.176715 (~17.2% SOC RMSE) | lr: 6.55e-05
+Epoch   50/100 | train: 0.001730 | val_mse: 0.178458 (~17.2% SOC RMSE) | lr: 5.00e-05
+Epoch   60/100 | train: 0.001537 | val_mse: 0.178082 (~17.2% SOC RMSE) | lr: 3.45e-05
+Epoch   70/100 | train: 0.001528 | val_mse: 0.178219 (~17.2% SOC RMSE) | lr: 2.06e-05
+Epoch   80/100 | train: 0.001555 | val_mse: 0.177958 (~17.2% SOC RMSE) | lr: 9.55e-06
+Epoch   90/100 | train: 0.001506 | val_mse: 0.178214 (~17.2% SOC RMSE) | lr: 2.45e-06
+Epoch  100/100 | train: 0.001598 | val_mse: 0.178086 (~17.2% SOC RMSE) | lr: 0.00e+00
+Training complete. Best loss: 0.126610. Checkpoints in checkpoints/sp4/calce_ft_fewshot5_s0/

@@ -1,0 +1,44 @@
+{
+  "source": "scripts/revision_nig_fullprecision.py",
+  "n_test": 5726,
+  "seeds": [
+    {
+      "seed": 0,
+      "soc_rmse": 0.6400450132787228,
+      "soh_rmse": 1.0860828682780266,
+      "best_epoch": 354
+    },
+    {
+      "seed": 1,
+      "soc_rmse": 0.6852612365037203,
+      "soh_rmse": 1.2353663332760334,
+      "best_epoch": 310
+    },
+    {
+      "seed": 2,
+      "soc_rmse": 0.7001734804362059,
+      "soh_rmse": 1.1030994355678558,
+      "best_epoch": 344
+    },
+    {
+      "seed": 3,
+      "soc_rmse": 0.7097688037902117,
+      "soh_rmse": 1.1186080053448677,
+      "best_epoch": 351
+    },
+    {
+      "seed": 4,
+      "soc_rmse": 0.6674405187368393,
+      "soh_rmse": 1.1852371506392956,
+      "best_epoch": 316
+    }
+  ],
+  "paired_ttest_vs_v12_mse_soc": {
+    "t": -0.20530668520531842,
+    "p": 0.8473573557701788
+  },
+  "paired_ttest_vs_v12_mse_soh": {
+    "t": -1.1926519281466386,
+    "p": 0.29891674400908064
+  }
+}

@@ -1,0 +1,24 @@
+\begin{tabular}{lcccccccc}
+\toprule
+& \multicolumn{2}{c}{B0005} & \multicolumn{2}{c}{B0006} & \multicolumn{2}{c}{B0007} & \multicolumn{2}{c}{B0018} \\
+\cmidrule(lr){2-3}\cmidrule(lr){4-5}\cmidrule(lr){6-7}\cmidrule(lr){8-9}
+Scheme & Cov. & Width & Cov. & Width & Cov. & Width & Cov. & Width \\
+\midrule
+\multicolumn{9}{l}{\textit{A. All windows of the held-out cell}} \\
+S0 split conformal & 60.7 $\pm$ 7.7 & 2.9 $\pm$ 0.5 & 33.8 $\pm$ 6.6 & 2.4 $\pm$ 0.6 & 81.4 $\pm$ 5.7 & 3.3 $\pm$ 0.3 & 33.0 $\pm$ 6.4 & 4.6 $\pm$ 3.4 \\
+S1 density-ratio weighting & 57.9 $\pm$ 1.9 & 2.7 $\pm$ 0.5 & 36.1 $\pm$ 4.2 & 2.8 $\pm$ 0.6 & 86.6 $\pm$ 9.7 & 3.7 $\pm$ 0.9 & 44.4 $\pm$ 15.7 & 5.5 $\pm$ 2.9 \\
+S2 optimal-transport weighting & 59.7 $\pm$ 6.3 & 2.8 $\pm$ 0.5 & 33.8 $\pm$ 6.1 & 2.4 $\pm$ 0.6 & 80.6 $\pm$ 7.0 & 3.2 $\pm$ 0.5 & 31.8 $\pm$ 5.5 & 4.3 $\pm$ 3.1 \\
+Mondrian (predicted-SOH terciles) & 60.5 $\pm$ 6.4 & 2.9 $\pm$ 0.5 & 34.5 $\pm$ 5.8 & 2.5 $\pm$ 0.5 & 80.9 $\pm$ 7.5 & 3.2 $\pm$ 0.4 & 30.5 $\pm$ 5.1 & 4.2 $\pm$ 2.7 \\
+CQR (linear quantile heads) & 62.8 $\pm$ 3.9 & 3.5 $\pm$ 0.3 & 37.8 $\pm$ 3.0 & 3.7 $\pm$ 0.8 & 83.4 $\pm$ 9.4 & 3.9 $\pm$ 0.2 & 40.0 $\pm$ 2.8 & 5.6 $\pm$ 2.3 \\
+\quad CQR, one-hidden-layer heads & 52.0 $\pm$ 7.5 & 2.4 $\pm$ 0.3 & 31.4 $\pm$ 5.3 & 2.4 $\pm$ 0.9 & 81.6 $\pm$ 3.1 & 3.0 $\pm$ 0.0 & 31.9 $\pm$ 5.3 & 4.2 $\pm$ 2.3 \\
+ACI (online, cycle-delayed labels) & 81.6 $\pm$ 1.7 & 4.3 $\pm$ 0.5 & 63.1 $\pm$ 4.9 & 4.8 $\pm$ 1.3 & 88.1 $\pm$ 2.0 & 3.8 $\pm$ 0.3 & 68.7 $\pm$ 9.2 & 9.1 $\pm$ 6.1 \\
+\quad ACI refusal (\%) & 10.7 $\pm$ 6.8 & -- & 54.3 $\pm$ 5.7 & -- & 0.0 $\pm$ 0.0 & -- & 37.7 $\pm$ 15.3 & -- \\
+\midrule
+\multicolumn{9}{l}{\textit{B. Windows of cycles after the 20th}} \\
+S0 (no correction) & 62.5 $\pm$ 7.3 & -- & 29.6 $\pm$ 4.9 & -- & 82.8 $\pm$ 5.2 & -- & 26.1 $\pm$ 7.4 & -- \\
+Sequential S1, $k=1$ cycle & 55.2 $\pm$ 6.1 & -- & 31.3 $\pm$ 7.1 & -- & 86.4 $\pm$ 10.9 & -- & 28.4 $\pm$ 5.8 & -- \\
+Sequential S1, $k=5$ cycles & 56.6 $\pm$ 8.8 & -- & 30.0 $\pm$ 6.0 & -- & 86.3 $\pm$ 10.2 & -- & 28.0 $\pm$ 5.3 & -- \\
+Sequential S1, $k=20$ cycles & 56.2 $\pm$ 7.2 & -- & 29.1 $\pm$ 5.4 & -- & 84.8 $\pm$ 9.4 & -- & 33.2 $\pm$ 12.0 & -- \\
+Transductive S1 (full target batch) & 59.6 $\pm$ 1.5 & -- & 31.4 $\pm$ 3.1 & -- & 87.6 $\pm$ 9.0 & -- & 38.0 $\pm$ 16.7 & -- \\
+\bottomrule
+\end{tabular}
