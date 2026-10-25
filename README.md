@@ -6,9 +6,11 @@ Code, result files, logs and figure/table scripts for the article
 > State-of-Health Estimation** (submitted to *Processes*)
 
 The article measures the coverage of split-conformal SOC and SOH intervals when an estimator trained on
-NASA cells is deployed on a held-out cell, under a different discharge protocol, or on another chemistry
-(CALCE, Oxford, MIT-TRI). The common estimator is UAPI-Former (`uapi_former/`); two baseline families
-and an extended Kalman filter are evaluated alongside it.
+NASA cells is deployed on a held-out cell, under a different discharge protocol, on another chemistry
+(CALCE, Oxford, MIT-TRI), or under an electric-vehicle driving profile (Stanford INR21700-M50T). The common
+estimator is UAPI-Former (`uapi_former/`); CNN-BiLSTM, a physics-guided Transformer, a temporal
+convolutional network, a physics-informed variant of the Transformer, and an extended Kalman filter are
+evaluated alongside it.
 
 ## Contents
 
@@ -23,7 +25,7 @@ and an extended Kalman filter are evaluated alongside it.
 | `docs/revision_r1/FIGURE_SOURCES.md` | for every figure and results table: the command, its output, and every input file it reads |
 | `docs/revision_r1/tables/` | the results tables as generated (LaTeX fragments) and the in-text numbers (`numbers.tex`) |
 | `checkpoints/README.md` | the trained models (release asset `checkpoints.zip`) |
-| `data/README.md`, `data/raw_files_sha256.txt` | the raw data: sources, release assets, and the SHA-256 of every raw file used |
+| `data/README.md`, `data/raw_files_sha256.txt` | the raw data: sources and the SHA-256 of every raw file used |
 
 ## Setup
 
@@ -36,25 +38,23 @@ pip install -r requirements.txt
 
 ## Large files (release assets)
 
-Checkpoints and raw data are too large for Git. The release
+The trained checkpoints are too large for Git. The release
 [`v1.0`](https://github.com/labaniakter-HAU/SOC-SOH---Physics/releases/tag/v1.0) carries:
 
 | Asset | Contents |
 |---|---|
 | `checkpoints.zip` | `checkpoints/`: the trained models behind the article (see `checkpoints/README.md`) |
-| `data_nasa.zip` | `data/raw/nasa/*.mat`: NASA Ames PCoE battery data |
-| `data_oxford.zip` | `data/raw/oxford/`: Oxford Battery Degradation Dataset 1 |
-| `SHA256SUMS.txt` | checksum of each asset |
+| `SHA256SUMS.txt` | checksum of the asset |
 
-Download the assets into one folder, then, from the repository root:
+Download both into one folder, then, from the repository root:
 
 ```bash
-python scripts/release_assets.py unpack --from <folder>   # checks the checksums, extracts into place
+python scripts/release_assets.py unpack --from <folder>   # checks the checksum, extracts into place
 ```
 
-The CALCE and MIT-TRI files are not redistributed here; `data/README.md` says where to get them and where
-to put them. `python scripts/release_assets.py verify` then checks every raw file against the SHA-256 of
-the copy used for the article.
+The raw data files are not redistributed; `data/README.md` says where to get each dataset and where to
+put it. `python scripts/release_assets.py verify` then checks every raw file against the SHA-256 of the
+copy used for the article.
 
 ## Reproducing the figures and tables
 

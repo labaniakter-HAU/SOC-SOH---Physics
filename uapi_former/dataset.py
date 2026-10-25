@@ -1367,3 +1367,84 @@ class OxfordDataset(Dataset):
 
     def __getitem__(self, index):
         return NASABatteryDataset.__getitem__(self, index) # type: ignore
+
+
+class StanfordM50TDataset(Dataset):
+    """Stanford INR21700-M50T cells aged with an EV driving profile (Pozzato, Allam & Onori, Data in
+    Brief 41 (2022) 107995; OSF project qsabn). Zero-shot evaluation target only (Processes R2.1).
+
+    Layout (scripts/revision_stanford_prep.py):
+        data_dir/cycling/Cycling_<k>/<cell>.mat   processed Arbin record: t (s), I (A, > 0 charge),
+                                                  V (V), Step_Index; about 10 Hz
+        data_dir/capacity.json                    {cell: {"cycles": [...], "capacity_ah": [...],
+                                                  "blocks": {"Cycling_<k>": cycles completed before it}}}
+    Every aging cycle: CC-CV charge to 4.2 V and 30 min rest, a C/4 discharge of 20 % of the rated
+    4.85 Ah (Arbin step 13), then a UDDS-based discharge of 60 % (step 14).
+
+    Windows: 200 s of the UDDS step at 1 Hz, stride 100 s. Labels follow the NASA loader: the cycle
+    capacity Q_cycle is the C/20 capacity-test value interpolated linearly in completed cycles,
+    SOC = 1 - Q_out / Q_cycle with Q_out the net charge delivered since the start of step 13 (full
+    charge), SOH = Q_cycle / first capacity test, clipped to [0.5, 1]. Features follow the NASA
+    loader with the NMC OCV table and R0 = 0.15 Ohm; the window's Coulomb feature is normalised by
+    the rated 4.85 Ah, and temperature is the 23 C chamber set point because the processed files
+    carry no temperature.
+    """
+
+    RATED_AH = 4.85
+    T_CHAMBER = 23.0
+    R0 = 0.15
+    STEP_CC, STEP_UDDS = 13, 14
+
+    def __init__(self, data_dir: str, cells: Optional[List[str]] = None, seq_len: int = 200):
+        import json
+        from scipy.io import loadmat
+        self.seq_len = seq_len
+        self.samples: List[Tuple[np.ndarray, Optional[np.ndarray], float, float]] = []
+        self.meta: List[Tuple[str, int, int]] = []    # (cell, completed aging cycles, window start)
+        cap = json.load(open(os.path.join(data_dir, "capacity.json")))
+        for cell in sorted(cap) if cells is None else cells:
+            c = cap[cell]
+            q_first = float(c["capacity_ah"][0])
+            for block, n0 in sorted(c["blocks"].items(), key=lambda kv: kv[1]):
+                m = loadmat(os.path.join(data_dir, "cycling", block, f"{cell}.mat"))
+                g = lambda k: np.asarray(m[f"{k}_full_vec_M1_NMC25degC"], dtype=np.float64).ravel()
+                t, I, V, S = g("t"), g("I"), g("V"), g("Step_Index").astype(int)
+                starts = np.flatnonzero(np.diff(S, prepend=-1) != 0)
+                ends = np.r_[starts[1:], len(S)]
+                # one aging cycle = a step-13 segment directly followed by a step-14 segment
+                j = 0
+                for a, a2, b2 in zip(starts[:-1], starts[1:], ends[1:]):
+                    if S[a] != self.STEP_CC or S[a2] != self.STEP_UDDS:
+                        continue
+                    q_cycle = float(np.interp(n0 + j, c["cycles"], c["capacity_ah"]))
+                    self._windows(cell, n0 + j, t[a:b2], I[a:b2], V[a:b2], t[a2], q_cycle,
+                                  float(np.clip(q_cycle / q_first, 0.5, 1.0)))
+                    j += 1
+        if not self.samples:
+            raise RuntimeError(f"No Stanford windows loaded from {data_dir}")
+
+    def _windows(self, cell, cycle, t, I, V, t_udds, q_cycle, soh):
+        q_out = -np.concatenate([[0.0], np.cumsum(0.5 * (I[1:] + I[:-1]) * np.diff(t))]) / 3600.0
+        t_u = np.arange(t[0], t[-1], 1.0)
+        V_1 = np.clip(np.interp(t_u, t, V), 2.5, 4.25).astype(np.float32)
+        I_1 = np.interp(t_u, t, I).astype(np.float32)
+        soc_1 = np.clip(1.0 - np.interp(t_u, t, q_out) / q_cycle, 0.0, 1.0).astype(np.float32)
+        V_start = float(V_1[0])
+        T_norm = np.full(self.seq_len, (self.T_CHAMBER - 25.0) / 15.0, dtype=np.float32)
+        first = int(np.searchsorted(t_u, t_udds))
+        for start in range(first, len(t_u) - self.seq_len + 1, self.seq_len // 2):
+            end = start + self.seq_len
+            V_w, I_w = V_1[start:end], I_1[start:end]
+            V_norm = (V_w - V_start).astype(np.float32)
+            V_ocv_norm = np.clip(V_norm + self.R0 * np.abs(I_w), -2.0, 0.5).astype(np.float32)
+            soc_ocv = _ocv_to_soc_nmc(np.clip(V_w + self.R0 * np.abs(I_w), 2.70, 4.20))
+            Q_cum = np.clip(np.cumsum(np.abs(I_w)) / 3600.0 / self.RATED_AH, 0.0, 0.5).astype(np.float32)
+            seq = np.stack([V_norm, I_w, T_norm, V_ocv_norm, soc_ocv, Q_cum], axis=-1)
+            self.samples.append((seq, None, float(soc_1[end - 1]), soh))
+            self.meta.append((cell, cycle, start - first))
+
+    def __len__(self):
+        return len(self.samples)
+
+    def __getitem__(self, index):
+        return NASABatteryDataset.__getitem__(self, index) # type: ignore

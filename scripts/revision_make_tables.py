@@ -26,7 +26,7 @@ def shown(x):
 # print mean +- SD from the per-seed lists.
 import revision_sp4_paths as sp
 
-NIG_LEVELS = ("random", "cross_protocol", "chemistry_calce", "chemistry_oxford")
+NIG_LEVELS = ("random", "cross_protocol", "chemistry_calce", "chemistry_oxford", "ev_stanford")
 
 
 def mean_view(objs):
@@ -182,7 +182,8 @@ SHIFTS = [("random", "Random intra-cell", ("random",)),
           ("p_B0025", "Protocol B0025", ("cross_protocol", "B0025")), ("p_B0026", "Protocol B0026", ("cross_protocol", "B0026")),
           ("p_B0027", "Protocol B0027", ("cross_protocol", "B0027")), ("p_B0028", "Protocol B0028", ("cross_protocol", "B0028")),
           ("calce", "CALCE zero-shot", ("chemistry_calce", "zero_shot")),
-          ("oxford", "Oxford zero-shot", ("chemistry_oxford", "zero_shot"))]
+          ("oxford", "Oxford zero-shot", ("chemistry_oxford", "zero_shot")),
+          ("ev", "EV profile (Stanford) zero-shot", ("ev_stanford", "zero_shot"))]
 
 
 def _entries(path_spec, d, loco_key):
@@ -361,6 +362,11 @@ def table_accuracy_merged():
     rs = cross_chemistry_rmse_seeds()
     for k, lab in (("calce", "CALCE"), ("oxford", "Oxford"), ("mit_tri", "MIT-TRI")):
         L.append(f"{lab} zero-shot & {ms([r[(k, 'zero')] for r in rs])} & -- & -- & {len(rs)} " + r"\\")
+    # EV driving profile (Stanford): the five v12-NIG checkpoints, from scripts/revision_r2_analyses.py
+    r2 = json.load(open("results/revision/r2_analyses.json"))
+    ev = [r2[f"ev_s{k}"]["soc_rmse"] for k in SEEDS]
+    L.append(r"\addlinespace")
+    L.append(f"EV profile (Stanford) zero-shot & {ms(ev)} & -- & -- & {len(ev)} " + r"\\")
     L += [r"\bottomrule", r"\end{tabular}"]
     write("accuracy_merged.tex", L)
     return len(L)
@@ -728,6 +734,259 @@ def supplement_list():
     return len(items["figure"]), len(items["table"])
 
 
+def review_r1_tables_and_macros(d):
+    """Processes round 1. Coverage with two-sample cycle-block bootstrap 95 % intervals and the SOC > 10 %
+    stratum (R2.6, R2.9: results/revision/rest_windows.json, scripts/revision_rest_windows.py); EOT per
+    backbone with a paired test (R2.9); the S1 refusal shared by the two tasks (R1.1)."""
+    from scipy.stats import wilcoxon
+    rw = json.load(open("results/revision/rest_windows.json"))
+    P = ("B0025", "B0026", "B0027", "B0028")
+    rows = [("Random split", [rw[f"random_s{k}"] for k in SEEDS])]
+    rows += [(f"Held-out {c}", [rw[f"loco_s{k}_{c}"] for k in SEEDS]) for c in CELLS]
+    rows += [(f"Protocol {c}", [rw[f"protocol_s{k}_{c}"] for k in SEEDS]) for c in P]
+    L = [r"\begin{tabular}{lcccccc}", r"\toprule",
+         r"Evaluation set & SOC coverage, all windows & SOC 95\% CI range & SOC $>$ 10\% coverage & Runs with upper bound $<$ 90\% & SOH coverage & SOH 95\% CI range \\",
+         r"\midrule"]
+    lo_hi = lambda es, k: f"{min(e[k]['ci95_pct'][0] for e in es):.1f}--{max(e[k]['ci95_pct'][1] for e in es):.1f}"
+    for name, es in rows:
+        L.append(f"{name} & {pct_txt([e['all']['s0_cov90_pct'] for e in es])} & {lo_hi(es, 'all')} & "
+                 f"{pct_txt([e['label_gt10']['s0_cov90_pct'] for e in es])} & "
+                 f"{sum(e['all']['ci95_pct'][1] < 90 for e in es)} of {len(es)} & "
+                 f"{pct_txt([e['soh_all']['s0_cov90_pct'] for e in es])} & {lo_hi(es, 'soh_all')} " + r"\\")
+        if name == "Random split" or name == f"Held-out {CELLS[-1]}":
+            L.append(r"\midrule")
+    L += [r"\bottomrule", r"\end{tabular}"]
+    write("coverage_ci.tex", L)
+
+    M = {}
+    rnd = rows[0][1]
+    assert all(e["all"]["ci95_pct"][0] <= 90 <= e["all"]["ci95_pct"][1] for e in rnd)     # "contains 90 % in every run"
+    loco = [(c, k, rw[f"loco_s{k}_{c}"]) for c in CELLS for k in SEEDS]
+    above = sorted({c for c, _, e in loco if e["all"]["ci95_pct"][1] >= 90})
+    assert above == ["B0007"], above                                       # text names the exceptions' cell
+    M["CiLocoBelowN"] = str(sum(e["all"]["ci95_pct"][1] < 90 for _, _, e in loco))
+    M["CiLocoRuns"] = str(len(loco))
+    M["CiLocoUpperMax"] = f"{max(e['all']['ci95_pct'][1] for _, _, e in loco):.1f}"
+    cov = [e["all"]["s0_cov90_pct"] for _, _, e in loco]
+    assert max(cov) < 90                                                   # "every run below 90 %"
+    M["LocoRunCovMax"] = f"{math.floor(10 * max(cov)) / 10:.1f}"
+    p = wilcoxon([x - 90 for x in cov]).pvalue
+    assert p < 1e-4
+    M["LocoWilcoxP"] = sci(p)
+    gt = {c: st.mean(rw[f"loco_s{k}_{c}"]["label_gt10"]["s0_cov90_pct"] for k in SEEDS) for c in CELLS}
+    M["GtTenLocoMin"], M["GtTenLocoMax"] = f"{min(gt.values()):.1f}", f"{max(gt.values()):.1f}"
+    pg = [st.mean(rw[f"protocol_s{k}_{c}"]["label_gt10"]["s0_cov90_pct"] for k in SEEDS) for c in P]
+    pgr = [rw[f"protocol_s{k}_{c}"]["label_gt10"] for k in SEEDS for c in P]
+    M["GtTenProtMax"] = f"{math.ceil(100 * max(pg)) / 100:.2f}"
+    M["GtTenProtRunMax"] = f"{math.ceil(10 * max(e['s0_cov90_pct'] for e in pgr)) / 10:.1f}"
+    M["GtTenProtUpperMax"] = f"{math.ceil(10 * max(e['ci95_pct'][1] for e in pgr)) / 10:.1f}"
+
+    # EOT per backbone and chemistry, and a paired test over the backbone--chemistry pairs
+    rs = cross_chemistry_rmse_seeds()
+    names = {"calce": "CALCE", "oxford": "Oxford", "mit_tri": "MIT-TRI"}
+    L = [r"\begin{tabular}{l" + "ccc" * len(sp.DATASETS) + "}", r"\toprule",
+         "Backbone & " + " & ".join(rf"\multicolumn{{3}}{{c}}{{{names[k]}}}" for k in sp.DATASETS) + r" \\",
+         " & " + " & ".join(["Zero-shot & EOT & Change (\\%)"] * len(sp.DATASETS)) + r" \\", r"\midrule"]
+    for s, x in zip(SEEDS, rs):
+        cells = [f"{x[(k, 'zero')]:.2f} & {x[(k, 'eot')]:.2f} & {100 * (x[(k, 'eot')] / x[(k, 'zero')] - 1):+.1f}" for k in sp.DATASETS]
+        L.append(f"Seed {s} & " + " & ".join(cells) + r" \\")
+    L += [r"\bottomrule", r"\end{tabular}"]
+    write("eot_per_backbone.tex", L)
+    diff = [x[(k, "eot")] - x[(k, "zero")] for x in rs for k in sp.DATASETS]
+    pe = wilcoxon(diff).pvalue
+    assert pe < 0.05 and sum(v < 0 for v in diff) > len(diff) / 2       # "lower in most pairs, significant"
+    M["EotWilcoxP"] = f"{pe:.4f}" if pe >= 1e-3 else sci(pe)
+
+    # R1.1: S1 refusal depends on the calibration weights only, which both tasks share
+    gaps, n = [], 0
+    for key in seed_keys(d, "loco_clean_s"):
+        for c in CELLS:
+            e = d[key][c]
+            for lv in ("cov90", "cov95"):
+                a, b = e["soc"][lv]["S1"], e["soh"][lv]["S1"]
+                assert a["refusal"] == b["refusal"], (key, c, lv)
+                n += 1
+            gaps.append(100 * abs(e["soc"]["cov90"]["S1"]["accepted_coverage"] - e["soh"]["cov90"]["S1"]["accepted_coverage"]))
+    assert n == 2 * len(CELLS) * len(SEEDS)
+    M["SharedRefGapMax"] = f"{max(gaps):.1f}"
+    # the same gap between the seed means that Table 2 prints
+    acc = lambda c, t: st.mean(100 * d[k][c][t]["cov90"]["S1"]["accepted_coverage"] for k in seed_keys(d, "loco_clean_s"))
+    mgap = {c: abs(shown(acc(c, "soc")) - shown(acc(c, "soh"))) for c in CELLS}
+    M["SharedRefGapMeanMax"] = f"{max(mgap.values()):.1f}"
+    M["SharedRefGapMeanCell"] = max(mgap, key=mgap.get)
+    assert max(mgap.values()) < max(gaps)
+    # the same identity in every stored S1 result of every shift level (response letter, R1.1)
+    raw, nall = json.load(open("results/revision/conformal_clean.json")), 0
+
+    def walk(o):
+        nonlocal nall
+        if isinstance(o, dict):
+            if isinstance(o.get("soc"), dict) and isinstance(o.get("soh"), dict):
+                for lv in ("cov90", "cov95"):
+                    a, b = o["soc"].get(lv, {}).get("S1"), o["soh"].get(lv, {}).get("S1")
+                    if a and b and "refusal" in a:
+                        assert a["refusal"] == b["refusal"]
+                        nall += 1
+            for v in o.values():
+                walk(v)
+    walk(raw)
+    M["SharedRefEntries"] = str(nall)
+    # abstract: S1 (transductive) does not reach nominal mean accepted coverage on any held-out cell
+    assert max(st.mean(100 * d[k][c]["soc"]["cov90"]["S1"]["accepted_coverage"] for k in seed_keys(d, "loco_clean_s"))
+               for c in CELLS) < 90
+    return M
+
+
+def review_r2_tables_and_macros():
+    """Processes round 1, Reviewer 2, from the saved predictions (results/revision/r2_analyses.json,
+    scripts/revision_r2_analyses.py): calibration size (R2.3), SOH-matched windows (R2.4/R2.5), per-cycle
+    coverage (R2.6), recalibration on labelled cycles of the deployed cell (R2.10), SOH vs SOC (R2.11)."""
+    r = json.load(open("results/revision/r2_analyses.json"))
+    P = ("B0025", "B0026", "B0027", "B0028")
+    lo = lambda c, f: [f(r[f"loco_clean_s{k}"][c]) for k in SEEDS]
+    pr = lambda c, f: [f(r[f"protocol_s{k}"][c]) for k in SEEDS]
+    fm = lambda c, f: st.mean(lo(c, f))
+    rows = [
+        ("Calibration cycles", lambda e: e["n_cal_cycles"], "{:.0f}"),
+        ("SOC S0 coverage, full calibration partition", lambda e: e["soc"]["S0_all"], "{:.1f}"),
+        (r"\quad 50\% of the calibration cycles", lambda e: e["soc"]["cal_size"]["0.5"]["mean"], "{:.1f}"),
+        (r"\quad 25\% of the calibration cycles", lambda e: e["soc"]["cal_size"]["0.25"]["mean"], "{:.1f}"),
+        ("Windows with SOH inside the calibration range (\\%)", lambda e: e["share_soh_matched"], "{:.1f}"),
+        (r"\quad SOC S0 coverage on these windows", lambda e: e["soc"]["S0_matched"], "{:.1f}"),
+        (r"\quad SOC S1 accepted coverage, weights refitted on them", lambda e: e["soc"]["S1_matched"]["accepted_cov"], "{:.1f}"),
+        (r"\quad SOH S0 coverage on these windows", lambda e: e["soh"]["S0_matched"], "{:.1f}"),
+        ("Cycles with SOC coverage $\\geq$ 90\\% (\\%)", lambda e: e["soc"]["per_cycle"]["share_ge90"], "{:.1f}"),
+        ("Median per-cycle SOC coverage (\\%)", lambda e: e["soc"]["per_cycle"]["median"], "{:.1f}"),
+    ]
+    L = [r"\begin{tabular}{lcccc}", r"\toprule", "Quantity & " + " & ".join(CELLS) + r" \\", r"\midrule"]
+    one = lambda v, fmt: fmt.format(v[0]) if len(set(v)) == 1 else ms(v, fmt)
+    for name, f, fmt in rows:
+        L.append(name + " & " + " & ".join(one(lo(c, f), fmt) for c in CELLS) + r" \\")
+    L += [r"\bottomrule", r"\end{tabular}"]
+    write("r2_heldout.tex", L)
+
+    variants = [("S0", "Source calibration (S0)")] + [(f"first{k}", f"First {k} labelled cycle{'s' if k > 1 else ''}") for k in (1, 5, 10)] \
+        + [(f"rolling{k}", f"Rolling, last {k} labelled cycles") for k in (3, 5, 10)]
+    L = [r"\begin{tabular}{l" + "c" * 8 + "}", r"\toprule",
+         r" & \multicolumn{4}{c}{Held-out cell} & \multicolumn{4}{c}{Protocol shift} \\",
+         r"\cmidrule(lr){2-5}\cmidrule(lr){6-9}", "Calibration & " + " & ".join(CELLS + list(P)) + r" \\", r"\midrule"]
+    for task in ("soc", "soh"):
+        L.append(rf"\multicolumn{{9}}{{l}}{{\textit{{{task.upper()}: coverage (\%) and mean full width (points)}}}} \\")
+        for v, name in variants:
+            cell = lambda vals_c, vals_w: f"{st.mean(vals_c):.1f} ({st.mean(vals_w):.1f})"
+            L.append(name + " & " + " & ".join(
+                cell(lo(c, lambda e: e[task]["recal"][v]["cov"]), lo(c, lambda e: e[task]["recal"][v]["width"])) for c in CELLS) + " & "
+                + " & ".join(cell(pr(c, lambda e: e[task]["recal"][v]["cov"]), pr(c, lambda e: e[task]["recal"][v]["width"])) for c in P) + r" \\")
+        if task == "soc":
+            L.append(r"\addlinespace")
+    L += [r"\bottomrule", r"\end{tabular}"]
+    write("recal.tex", L)
+
+    M = {}
+    ncal = [e for c in CELLS for e in lo(c, lambda e: e["n_cal_cycles"])]
+    M["CalCyclesMin"], M["CalCyclesMax"] = str(min(ncal)), str(max(ncal))
+    shift = [abs(fm(c, lambda e, fr=fr: e["soc"]["cal_size"][fr]["mean"]) - fm(c, lambda e: e["soc"]["S0_all"]))
+             for c in CELLS for fr in ("0.25", "0.5")]
+    assert max(shift) < 2.0                                    # "coverage barely moves when the calibration set shrinks"
+    M["CalSubShiftMax"] = f"{math.ceil(10 * max(shift)) / 10:.1f}"
+    share = [fm(c, lambda e: e["share_soh_matched"]) for c in CELLS]
+    M["MatchedShareMin"], M["MatchedShareMax"] = f"{min(share):.1f}", f"{max(share):.1f}"
+    for key, f in (("MatchedSoc", lambda e: e["soc"]["S0_matched"]), ("MatchedSone", lambda e: e["soc"]["S1_matched"]["accepted_cov"]),
+                   ("MatchedSoh", lambda e: e["soh"]["S0_matched"])):
+        v = [fm(c, f) for c in CELLS]
+        assert max(v) < 90, key                                # "matching SOH does not restore coverage"
+        M[key + "Min"], M[key + "Max"] = f"{min(v):.1f}", f"{max(v):.1f}"
+    cyc = [fm(c, lambda e: e["soc"]["per_cycle"]["share_ge90"]) for c in CELLS]
+    med = [fm(c, lambda e: e["soc"]["per_cycle"]["median"]) for c in CELLS]
+    assert max(med) < 90
+    M["CycNinetyMin"], M["CycNinetyMax"] = f"{min(cyc):.1f}", f"{max(cyc):.1f}"
+    M["CycMedianMin"], M["CycMedianMax"] = f"{min(med):.1f}", f"{max(med):.1f}"
+    for task, T in (("soc", "Soc"), ("soh", "Soh")):
+        roll = [fm(c, lambda e: e[task]["recal"]["rolling5"]["cov"]) for c in CELLS]
+        assert 85 <= min(roll) and max(roll) <= 91, (task, roll)   # "close to the nominal level on every held-out cell"
+        M[f"Roll{T}Min"], M[f"Roll{T}Max"] = f"{min(roll):.1f}", f"{max(roll):.1f}"
+    rw = [fm(c, lambda e: e["soc"]["recal"]["rolling5"]["width"]) for c in CELLS]
+    sw = [fm(c, lambda e: e["soc"]["recal"]["S0"]["width"]) for c in CELLS]
+    M["RollWidthMin"], M["RollWidthMax"] = f"{min(rw):.1f}", f"{max(rw):.1f}"
+    M["SzeroEvWidthMin"], M["SzeroEvWidthMax"] = f"{min(sw):.1f}", f"{max(sw):.1f}"
+    first = {c: fm(c, lambda e: e["soc"]["recal"]["first5"]["cov"]) for c in CELLS}
+    below = sorted(c for c, v in first.items() if v < 90)
+    assert len(below) == 3, first                              # "fails on three of the four cells"
+    M["FirstFiveBelowN"] = "three"
+    M["FirstFiveMin"], M["FirstFiveMax"] = f"{min(first[c] for c in below):.1f}", f"{max(first[c] for c in below):.1f}"
+    pc = [st.mean(pr(c, lambda e: e["soc"]["recal"]["rolling5"]["cov"])) for c in P]
+    pw = [st.mean(pr(c, lambda e: e["soc"]["recal"]["rolling5"]["width"])) for c in P]
+    assert min(pc) >= 89 and min(pw) > 50                      # nominal on protocol cells only with intervals wider than half the range
+    M["ProtRollMin"], M["ProtRollMax"] = f"{min(pc):.1f}", f"{max(pc):.1f}"
+    M["ProtRollWidthMin"], M["ProtRollWidthMax"] = f"{min(pw):.1f}", f"{max(pw):.1f}"
+    # R2.11: fragment-based SOH intervals against SOC intervals, window level, S0
+    gap = {c: fm(c, lambda e: e["soh"]["S0_all"]) - fm(c, lambda e: e["soc"]["S0_all"]) for c in CELLS}
+    better = [c for c in CELLS if shown(gap[c]) > 0.5]
+    equal = [c for c in CELLS if abs(gap[c]) <= 0.5]
+    assert len(better) == 3 and equal == ["B0006"], gap
+    M["SohSocBetterN"], M["SohSocEqualCell"] = "three", equal[0]
+    M["SohSocGapMin"], M["SohSocGapMax"] = f"{min(gap[c] for c in better):.1f}", f"{max(gap[c] for c in better):.1f}"
+    return M
+
+
+def ev_tables_and_macros(d):
+    """R2.1: Stanford INR21700-M50T cells under a UDDS-based EV driving profile, zero-shot with the five
+    v12-NIG checkpoints (conformal_clean.json ev_stanford_s*, scripts/revision_conformal_clean.py --level ev)
+    and per-cell detail and recalibration (r2_analyses.json ev_s*, scripts/revision_r2_analyses.py)."""
+    r = json.load(open("results/revision/r2_analyses.json"))
+    ev = [r[f"ev_s{k}"] for k in SEEDS]
+    zs = [e["zero_shot"] for e in d["ev_stanford_seeds"]]
+    cells = sorted(ev[0]["cells"])
+    assert all(sorted(e["cells"]) == cells for e in ev)
+    L = [r"\begin{tabular}{lccccccc}", r"\toprule",
+         r"Cell & Cycles & Windows & SOH range & SOC RMSE (\%) & S0 SOC cov.\ (\%) & S0 SOH cov.\ (\%) & "
+         r"Rolling SOC cov.\ (\%, width) \\", r"\midrule"]
+    roll, rollw = {}, {}
+    for c in cells:
+        x = ev[0]["cells"][c]
+        roll[c] = st.mean(e["soc"]["cells"][c]["recal"]["rolling5"]["cov"] for e in ev)
+        rollw[c] = st.mean(e["soc"]["cells"][c]["recal"]["rolling5"]["width"] for e in ev)
+        L.append(f"{c} & {x['n_cycles']} & {x['n_windows']:,}".replace(",", "{,}") + f" & {x['soh_min']:.3f}--{x['soh_max']:.3f} & "
+                 f"{ms([e['cells'][c]['soc_rmse'] for e in ev])} & {ms([e['soc']['cells'][c]['S0'] for e in ev], '{:.2f}')} & "
+                 f"{ms([e['soh']['cells'][c]['S0'] for e in ev], '{:.1f}')} & {roll[c]:.1f} ({rollw[c]:.1f}) " + r"\\")
+    L += [r"\bottomrule", r"\end{tabular}"]
+    write("ev_stanford.tex", L)
+
+    M = {}
+    soc0 = [100 * z["soc"]["cov90"]["S0"]["coverage"] for z in zs]
+    soh0 = [100 * z["soh"]["cov90"]["S0"]["coverage"] for z in zs]
+    ref = [100 * z["soc"]["cov90"]["S1"]["refusal"] for z in zs]
+    s2 = [100 * z["soc"]["cov90"]["S2"]["coverage"] for z in zs]
+    assert all(z["soc"]["cov90"]["S1"]["refusal"] == z["soh"]["cov90"]["S1"]["refusal"] for z in zs)
+    assert max(soc0) < 5 and max(soh0) < 50 and max(s2) < 5 and min(ref) > 95     # "almost no coverage; S1 refuses"
+    M["EvSocSzeroMax"] = f"{math.ceil(100 * max(soc0)) / 100:.2f}"
+    M["EvSocSzeroMean"] = f"{st.mean(soc0):.2f}"
+    M["EvSohSzeroMax"] = f"{math.ceil(10 * max(soh0)) / 10:.1f}"
+    M["EvStwoMax"] = f"{math.ceil(100 * max(s2)) / 100:.2f}"
+    M["EvRefMin"] = f"{math.floor(10 * min(ref)) / 10:.1f}"
+    rm = [e["soc_rmse"] for e in ev]
+    rr = [e["soc_r"] for e in ev]
+    M["EvSocRmseMin"], M["EvSocRmseMax"] = f"{min(rm):.1f}", f"{max(rm):.1f}"
+    M["EvSocRMin"], M["EvSocRMax"] = f"{min(rr):.2f}", f"{max(rr):.2f}"
+    sig = [e["soc"]["sigma_ratio"] for e in ev]
+    assert max(sig) < 1                                        # "the evidential scale is smaller than on the calibration data"
+    M["EvSigmaRatioMin"], M["EvSigmaRatioMax"] = f"{min(sig):.2f}", f"{max(sig):.2f}"
+    M["EvCells"] = {4: "four"}[len(cells)]
+    M["EvCycles"] = str(sum(ev[0]["cells"][c]["n_cycles"] for c in cells))
+    M["EvWindows"] = f"{ev[0]['n_windows']:,}".replace(",", "{,}")
+    M["EvSohMin"] = f"{min(ev[0]['cells'][c]['soh_min'] for c in cells):.3f}"
+    assert min(roll.values()) >= 89 and min(rollw.values()) > 100   # "near nominal only with intervals wider than the SOC range"
+    M["EvRollSocMin"], M["EvRollSocMax"] = f"{min(roll.values()):.1f}", f"{max(roll.values()):.1f}"
+    M["EvRollWidthMin"], M["EvRollWidthMax"] = f"{min(rollw.values()):.1f}", f"{max(rollw.values()):.1f}"
+    return M
+
+
+def sci(p):
+    """p-value as LaTeX scientific notation, e.g. 1.9\\times10^{-6}."""
+    m, e = f"{p:.1e}".split("e")
+    return rf"{m}\times10^{{{int(e)}}}"
+
+
 def macros():
     """In-text numbers as LaTeX macros so prose can never drift from the tables."""
     d = load_cc()
@@ -786,6 +1045,7 @@ def macros():
         M["BsixKnnRatioMin"], M["BsixKnnRatioMax"] = f"{min(kr):.1f}", f"{max(kr):.1f}"
         M.update(b0006_macros(diag))
     M.update(baselines_shift_macros())
+    M.update(new_baselines_macros())
     # Sec. 3.5 / Table 2 (R1.5): baseline protocol and the early-stopping sensitivity
     fx = json.load(open("results/revision/baselines_random_fixed.json"))
     es = json.load(open("results/revision/sensitivity/baselines_random_earlystop.json"))
@@ -866,6 +1126,9 @@ def macros():
     M["OxTrainN"], M["OxTestCycles"] = fmt_n(ox["n_train"]), str(ox["n_test_cycles"])
     assert float(M["ChemCovMax"]) <= float(M["ProtSzeroMax"]), (M["ChemCovMax"], M["ProtSzeroMax"])
     M.update(claim_macros(d))
+    M.update(review_r1_tables_and_macros(d))
+    M.update(review_r2_tables_and_macros())
+    M.update(ev_tables_and_macros(d))
     M.update(software_macros())
     M.update(loco_objective_macros())
     # Sec. 4.5: longer training makes the PI-Transformer "both more accurate and better covered
@@ -1017,7 +1280,8 @@ def fc_macros(d):
     M["STwoProtMin"], M["STwoProtMax"] = rng(s2p)
     M["STwoChemMax"] = f"{max(100 * d[k]['zero_shot']['soc']['cov90']['S2']['coverage'] for k in zs):.2f}"
     auc = [e[c]["discriminator_auc"] for e in P for c in ("B0025", "B0026", "B0027", "B0028")] + \
-          [e["discriminator_auc"] for k in zs for e in zs[k]]
+          [e["discriminator_auc"] for k in zs for e in zs[k]] + \
+          [e["zero_shot"]["discriminator_auc"] for e in d["ev_stanford_seeds"]]       # the EV profile is in the same sentence
     # "AUC at least X": X is the minimum floored to four decimals (0.99997 must not print as 1.000)
     M["AucShiftMin"] = f"{math.floor(min(auc) * 1e4) / 1e4:.4f}"
     assert min(auc) >= float(M["AucShiftMin"])
@@ -1473,6 +1737,9 @@ def cp_and_chemistry_macros():
     within = max(s2d + [abs(x) for x in dl] + [abs(tab("Mondrian", c) - tab("S0", c)) for c in CELLS])
     M["CpWithinMax"] = f"{within:.0f}"
     assert within <= int(M["CpWithinMax"])                       # "within N points" stays true after rounding
+    # abstract (round 1): none of these schemes reaches nominal mean coverage on any held-out cell (S1: review_r1)
+    assert max([tab(k, c) for k in ("S0", "Mondrian", "CQR") for c in CELLS]
+               + [st.mean(100 * e["S2"]["accepted_coverage"] for e in s2[c]) for c in CELLS]) < 90
     # v12-NIG zero-shot (Table 5) and every v12-MSE source-calibrated row of the cross-chemistry
     # table; the former EOT-warped entries paired v12-MSE transducers with v12-NIG latents (invalid)
     chem = [100 * e["zero_shot"]["soc"]["cov90"]["S0"]["coverage"] for k in ("chemistry_calce", "chemistry_oxford")
@@ -1679,7 +1946,7 @@ def baselines_sensitivity_macros():
     M["SensBestEpochMin"], M["SensBestEpochMax"] = str(min(be)), str(max(be))
     # pinned seeds only: baselines_loco.json also holds the seed 3-4 runs (SP2, not yet in the text)
     import re as _re
-    es = [v["best_epoch"] for n, v in tr_p.items() if "best_epoch" in v
+    es = [v["best_epoch"] for n, v in tr_p.items() if "best_epoch" in v and n.startswith(("cnn_bilstm_", "pi_transformer_"))
           and int(_re.search(r"_s(\d+)_B\d{4}$", n).group(1)) in SEEDS]
     M["EsBestEpochMin"], M["EsBestEpochMax"] = str(min(es)), str(max(es))
     ue = [r[c]["best_epoch"] for r in lc.values() for c in CELLS]
@@ -1713,6 +1980,8 @@ def baselines_sensitivity_macros():
 
 BSHIFT_ESTS = [("uapi_former", "UAPI-Former"), ("cnn_bilstm", "CNN--BiLSTM"),
                ("pi_transformer", "Physics-guided Transformer")]
+# Processes round 1 (R2.2, R2.7): estimators added to Table 4 only; the claims about the original three keep their guards
+NEW_ESTS = [("tcn", "TCN"), ("pinn_l1", r"Physics-informed, $\lambda = 1$"), ("pinn_l10", r"Physics-informed, $\lambda = 10$")]
 
 
 def baselines_shift_summary():
@@ -1727,7 +1996,7 @@ def baselines_shift_summary():
     base = json.load(open("results/revision/baselines_loco.json"))
     lc = loco_runs()
     S = {}
-    for key, _ in BSHIFT_ESTS:
+    for key, _ in BSHIFT_ESTS + NEW_ESTS:
         for c in CELLS:
             d = S.setdefault((key, c), {f: [] for f in ("rmse", "s0", "s1", "ref", "auc", "ess")})
             for seed, r in runs.items():                       # KeyError = missing run: fail loudly
@@ -1752,7 +2021,7 @@ def table_baselines_shift():
     rows = [(r"SOC RMSE (\%)", "rmse", "{:.2f}"), (r"S0 coverage (\%)", "s0", "{:.1f}"),
             (r"S1 accepted coverage (\%)", "s1", "{:.1f}"),
             ("Discriminator AUC", "auc", "{:.2f}"), (r"S1 ESS (\% of $n_{\mathrm{cal}}$)", "ess", "{:.0f}")]
-    for key, lab in BSHIFT_ESTS:
+    for key, lab in BSHIFT_ESTS + NEW_ESTS:
         for i, (rlab, f, fmt) in enumerate(rows):
             L.append((lab if i == 0 else "") + f" & {rlab} & "
                      + " & ".join(ms(S[(key, c)][f], fmt) for c in CELLS) + r" \\")
@@ -1778,9 +2047,9 @@ def baselines_shift_macros():
     tag = {"B0005": "Bfive", "B0006": "Bsix", "B0007": "Bseven", "B0018": "Beighteen"}
     M = {"BshiftSeeds": {1: "one", 2: "two", 3: "three", 4: "four", 5: "five"}[len(seeds)]}
 
-    # (1) no estimator reaches nominal on the two hardest folds
+    # (1) no estimator reaches nominal on the two hardest folds (every estimator Table 4 shows)
     for c in ("B0006", "B0018"):
-        v = [m(k, c, "s0") for k in E]
+        v = [m(k, c, "s0") for k in E + [k for k, _ in NEW_ESTS]]
         assert max(v) < 80, ("claim 'every estimator well below nominal' fails at", c, v)
         M[f"BshiftCov{tag[c]}Min"], M[f"BshiftCov{tag[c]}Max"] = f"{min(v):.1f}", f"{max(v):.1f}"
 
@@ -1847,8 +2116,9 @@ def baselines_shift_macros():
     M["BshiftAucBeighteenMin"], M["BshiftAucBeighteenMax"] = f"{min(a18):.2f}", f"{max(a18):.2f}"
     M["BshiftEssBeighteenMin"], M["BshiftEssBeighteenMax"] = f"{min(e18):.0f}", f"{max(e18):.0f}"
     # caption: S1 refusal is zero everywhere except one (estimator, fold, seed)
-    # Table 4 caption: in how many estimator-fold-seed runs S1 refused any window, and the largest refusal
-    allr = [(r, k, c) for k in E for c in CELLS for r in S[(k, c)]["ref"]]
+    # Table 4 caption: in how many estimator-fold-seed runs S1 refused any window, and the largest refusal,
+    # over every estimator the table shows
+    allr = [(r, k, c) for k in E + [k for k, _ in NEW_ESTS] for c in CELLS for r in S[(k, c)]["ref"]]
     nz = [x for x in allr if x[0] > 0]
     assert len(nz) < len(allr) / 4, nz                                   # "refused no window in most runs"
     top = max(allr)
@@ -1856,7 +2126,48 @@ def baselines_shift_macros():
     M["BshiftMaxRefusal"] = f"{top[0]:.1f}"
     M["BshiftMaxRefusalCell"] = top[2]
     M["BshiftMaxRefusalEst"] = {"uapi_former": "UAPI-Former", "cnn_bilstm": "CNN--BiLSTM",
-                                "pi_transformer": "physics-guided Transformer"}[top[1]]
+                                "pi_transformer": "physics-guided Transformer", "tcn": "TCN",
+                                "pinn_l1": r"physics-informed, $\lambda = 1$",
+                                "pinn_l10": r"physics-informed, $\lambda = 10$"}[top[1]]
+    return M
+
+
+def new_baselines_macros():
+    """R2.2 / R2.7: the TCN and the physics-informed (PINN-loss) variant under the same LOCO protocol."""
+    seeds, S = baselines_shift_summary()
+    m = lambda k, c, f: st.mean(S[(k, c)][f])
+    N = [k for k, _ in NEW_ESTS]
+    M = {}
+    tag = {"B0005": "Bfive", "B0006": "Bsix", "B0007": "Bseven", "B0018": "Beighteen"}
+    for k, t in (("tcn", "Tcn"), ("pinn_l1", "PinnOne"), ("pinn_l10", "PinnTen")):
+        for c in CELLS:
+            M[f"{t}Cov{tag[c]}"] = f"{m(k, c, 's0'):.1f}"
+            M[f"{t}Rmse{tag[c]}"] = f"{m(k, c, 'rmse'):.2f}"
+    for c in CELLS:                                            # the parent network of the physics-informed variant
+        M[f"PiCov{tag[c]}"] = f"{m('pi_transformer', c, 's0'):.1f}"
+        M[f"PiRmse{tag[c]}"] = f"{m('pi_transformer', c, 'rmse'):.2f}"
+    # "the TCN is the least accurate estimator on every held-out cell"
+    allk = [k for k, _ in BSHIFT_ESTS] + N
+    assert all(m("tcn", c, "rmse") == max(m(k, c, "rmse") for k in allk) for c in CELLS)
+    words = {0: "none", 1: "one", 2: "two", 3: "three", 4: "four"}
+    for k, t in (("pinn_l1", "PinnOne"), ("pinn_l10", "PinnTen")):
+        better = [c for c in CELLS if m(k, c, "rmse") < m("pi_transformer", c, "rmse")]
+        M[f"{t}BetterN"] = words[len(better)]
+        M[f"{t}WorseCells"] = " and ".join(c for c in CELLS if c not in better) or "none"
+    hard = [m(k, c, "s0") for k in N for c in ("B0006", "B0018")]
+    assert max(hard) < 80                                      # "far below nominal on the two hardest cells"
+    M["NewHardCovMin"], M["NewHardCovMax"] = f"{min(hard):.1f}", f"{max(hard):.1f}"
+    # the physics residual against the same network without it, as the one-decimal means of Table 4
+    gain = [shown(m(k, c, "s0")) - shown(m("pi_transformer", c, "s0")) for k in ("pinn_l1", "pinn_l10") for c in CELLS]
+    assert min(gain) > 0                                       # "raises S0 coverage on every held-out cell"
+    M["PinnGainMin"], M["PinnGainMax"] = f"{min(gain):.1f}", f"{max(gain):.1f}"
+    ph = [m(k, c, "s0") for k in ("pinn_l1", "pinn_l10") for c in ("B0006", "B0018")]
+    M["PinnHardMin"], M["PinnHardMax"] = f"{min(ph):.1f}", f"{max(ph):.1f}"
+    assert m("pinn_l10", "B0005", "s0") >= 90                  # "the lambda = 10 variant reaches the nominal level on B0005"
+    # cells on which any added estimator reaches the nominal level on average, named in the text
+    nominal = sorted({c for k in N for c in CELLS if m(k, c, "s0") >= 90})
+    M["NewNominalCells"] = " and ".join(nominal) if nominal else "none"
+    assert [c for c in CELLS if m("tcn", c, "s0") >= 90] == ["B0005"]    # "the TCN reaches the nominal level only on B0005"
     return M
 
 
@@ -1883,10 +2194,11 @@ def table_support_diagnostics():
 if __name__ == "__main__":
     table_coverage("soc"); table_coverage("soh"); table_support_diagnostics(); table_cross_chemistry(); table_eot_variants()
     table_calce_fewshot(); table_coverage_merged(); table_accuracy_merged(); table_comparators()
-    if os.path.exists("docs/revision_r1/supplement.tex"):    # manuscript source: not part of the code release
-        supplement_list()
     n1 = table_loco_accuracy()
     n2 = table_sequential()
     n3 = table_cp_baselines(); table_benchmark(); table_baselines_shift()
     table_ablation(); table_cross_protocol(); table_baselines_protocol(); macros()
+    # last: it reads supplement.aux, which a new supplement table only enters after one LaTeX build
+    if os.path.exists("docs/revision_r1/supplement.tex"):    # manuscript source: not part of the code release
+        supplement_list()
     print(f"LOCO seeds: {n1} | sequential seeds: {n2} | cp-baseline seeds: {n3}")

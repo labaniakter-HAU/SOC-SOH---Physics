@@ -59,7 +59,9 @@
 !scripts/revision_model_storage.py
 !scripts/revision_nig_fullprecision.py
 !scripts/revision_oxford_stats.py
+!scripts/revision_r2_analyses.py
 !scripts/revision_rest_windows.py
+!scripts/revision_stanford_prep.py
 !scripts/revision_runtime_s1.py
 !scripts/revision_score_dependence.py
 !scripts/revision_seeds.py
@@ -138,6 +140,7 @@
 !results/revision/loco_clean_s4.json
 !results/revision/model_storage.json
 !results/revision/nig_multiseed_fullprecision.json
+!results/revision/r2_analyses.json
 !results/revision/rest_windows.json
 !results/revision/runtime_s1.json
 !results/revision/score_dependence.json
@@ -222,6 +225,7 @@
 !docs/revision_r1/tables/baselines_shift.tex
 !docs/revision_r1/tables/benchmark.tex
 !docs/revision_r1/tables/calce_fewshot.tex
+!docs/revision_r1/tables/coverage_ci.tex
 !docs/revision_r1/tables/comparators.tex
 !docs/revision_r1/tables/coverage_merged.tex
 !docs/revision_r1/tables/coverage_soc.tex
@@ -229,6 +233,10 @@
 !docs/revision_r1/tables/cp_baselines.tex
 !docs/revision_r1/tables/cross_chemistry.tex
 !docs/revision_r1/tables/cross_protocol.tex
+!docs/revision_r1/tables/eot_per_backbone.tex
+!docs/revision_r1/tables/ev_stanford.tex
+!docs/revision_r1/tables/r2_heldout.tex
+!docs/revision_r1/tables/recal.tex
 !docs/revision_r1/tables/eot_variants.tex
 !docs/revision_r1/tables/loco_accuracy.tex
 !docs/revision_r1/tables/numbers.tex

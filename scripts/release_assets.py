@@ -1,22 +1,20 @@
 """
 Build, unpack and verify the large files of the code release.
 
-Git holds the code, the result files, the evaluation logs and the figures. The trained checkpoints and
-the raw data files whose terms allow redistribution are too large for Git; they are attached to the
-GitHub release as assets, each below GitHub's limit of 2 GiB per file:
+Git holds the code, the result files, the evaluation logs and the figures. The trained checkpoints are
+too large for Git; they are attached to the GitHub release as an asset, below GitHub's limit of 2 GiB
+per file:
 
   checkpoints.zip     the trained models behind the article (checkpoints/README.md)
-  data_nasa.zip       data/raw/nasa/*.mat    NASA Ames PCoE battery data (U.S. Government work)
-  data_oxford.zip     data/raw/oxford/*.mat  Oxford Battery Degradation Dataset 1 (ODC-ODbL 1.0)
-  SHA256SUMS.txt      SHA-256 and size of every asset
+  SHA256SUMS.txt      SHA-256 and size of the asset
 
-The CALCE and MIT-TRI files are not redistributed; download them from their sources (data/README.md).
+The raw data files are not redistributed; download them from their sources (data/README.md).
 data/raw_files_sha256.txt lists every raw file the loaders read, with its SHA-256, so any copy can be
 checked against the files used for the article.
 
-  python scripts/release_assets.py unpack --from DIR   # verify the downloaded assets and extract them
+  python scripts/release_assets.py unpack --from DIR   # verify the downloaded asset and extract it
   python scripts/release_assets.py verify              # check data/raw/ against data/raw_files_sha256.txt
-  python scripts/release_assets.py build --out DIR     # maintainers: make the assets and SHA256SUMS.txt
+  python scripts/release_assets.py build --out DIR     # maintainers: make the asset and SHA256SUMS.txt
   python scripts/release_assets.py list                # maintainers: rewrite data/raw_files_sha256.txt
 """
 import argparse
@@ -32,14 +30,17 @@ LIST = "data/raw_files_sha256.txt"
 SUMS = "SHA256SUMS.txt"
 LIMIT = 2 * 1024 ** 3                   # GitHub release asset limit
 CALCE_CELLS = ("CS2_33", "CS2_34", "CS2_35", "CS2_36", "CX2_33", "CX2_34", "CX2_35", "CX2_36")
-ZIPPED = {"data_nasa.zip": "nasa", "data_oxford.zip": "oxford"}
 CELL = r"B00(05|06|07|18)"
 CHECKPOINT_DIRS = (r"nasa_v12_seed[0-4]", r"nasa_v12_nig_seed[0-4]", r"nasa_v12", r"nasa_v12_nig",
                    rf"loco_clean_s[0-4]_{CELL}", r"baseline_(cnn_bilstm|pi_transformer)_seed[0-4]_random_fixed",
-                   rf"baseline_(cnn_bilstm|pi_transformer)_s[0-4]_{CELL}(_fixed100)?", r"sp4")
+                   rf"baseline_(cnn_bilstm|pi_transformer)_s[0-4]_{CELL}(_fixed100)?",
+                   rf"baseline_(tcn|pinn_l1|pinn_l10)_s[0-4]_{CELL}", r"sp4")
 CHECKPOINT_FILES = r"best\.pt|best_calibrated\.pt|eot_transducer_s[0-4]_(calce|oxford|mit_tri)\.pt"
-SOURCES = {"calce": "https://calce.umd.edu/battery-data",
-           "mit_tri": "https://data.matr.io/1/projects/5c48dd2bc625d700019f3204"}
+SOURCES = {"nasa": "https://www.nasa.gov/intelligent-systems-division/discovery-and-systems-health/pcoe/pcoe-data-set-repository/",
+           "oxford": "https://doi.org/10.5287/bodleian:KO2kdmYGg",
+           "calce": "https://calce.umd.edu/battery-data",
+           "mit_tri": "https://data.matr.io/1/projects/5c48dd2bc625d700019f3204",
+           "stanford_m50t": "https://osf.io/qsabn/ (scripts/revision_stanford_prep.py downloads the subset)"}
 
 
 def sha256(path):
@@ -66,7 +67,9 @@ def raw_files(root):
     for cell in CALCE_CELLS:                                     # the patterns of CALCEDataset
         for pat in (("*.csv",), ("*.xlsx",), ("*", "*.csv"), ("*", "*.xlsx")):
             files += g("calce", cell, *pat)
-    return files + g("oxford", "*.mat") + g("mit_tri", "*.mat")
+    stanford = g("stanford_m50t", "cycling", "Cycling_*", "*.mat") + g("stanford_m50t", "capacity", "Diag_*", "*.xlsx") \
+        + g("stanford_m50t", "capacity.json")                   # StanfordM50TDataset and scripts/revision_stanford_prep.py
+    return files + g("oxford", "*.mat") + g("mit_tri", "*.mat") + stanford
 
 
 def checkpoint_files():
@@ -94,7 +97,7 @@ def read_list():
 
 def cmd_list(_):
     files = raw_files(ROOT)
-    for d in ("nasa", "calce", "oxford", "mit_tri"):
+    for d in ("nasa", "calce", "oxford", "mit_tri", "stanford_m50t"):
         assert any(dataset(f) == d for f in files), f"no {d} files under data/raw/"
     lines = ["# Raw data files read by the loaders in uapi_former/dataset.py: SHA-256, size in bytes, path.",
              "# Check a copy with: python scripts/release_assets.py verify"]
@@ -115,16 +118,8 @@ def cmd_build(a):
     out = os.path.abspath(a.out)
     os.makedirs(out, exist_ok=True)
     assert not os.listdir(out), f"{out} is not empty"
-    listed = read_list()
-    data = {name: [p for p in listed if dataset(p) == d] for name, d in ZIPPED.items()}
-    for name, paths in data.items():           # the files released must be the listed ones (the ones used)
-        assert paths, name
-        for p in paths:
-            assert (os.path.getsize(os.path.join(ROOT, p)), sha256(os.path.join(ROOT, p))) == listed[p][::-1], p
     ck = checkpoint_files()
     zip_files(os.path.join(out, "checkpoints.zip"), ck)
-    for name, paths in data.items():
-        zip_files(os.path.join(out, name), paths)
     lines = []
     for name in sorted(os.listdir(out)):
         n = os.path.getsize(os.path.join(out, name))

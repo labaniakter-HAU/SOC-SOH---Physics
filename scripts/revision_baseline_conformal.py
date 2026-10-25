@@ -92,11 +92,14 @@ def main():
                     help="suffix of the LOCO baseline checkpoint dirs (e.g. _fixed100)")
     ap.add_argument("--active", action="store_true",
                     help="calibrate and evaluate on windows with SOC label > 0 only (spec 2026-09-24 §4.1)")
+    ap.add_argument("--models", nargs="+", default=list(MODELS),
+                    help="learned baselines to score; entries of other estimators already in the output file are kept")
     a = ap.parse_args()
     dev = torch.device(a.device)
-    out = {}
+    path = a.out or f"results/revision/baseline_conformal_s{a.seed}.json"
+    out = json.load(open(path)) if os.path.exists(path) else {}
     for cell in CELLS:
-        entry = {}
+        entry = out.get(cell, {})
         # --- UAPI-Former reference, same score (absolute residual, sigma == 1) ---
         c = torch.load(f"results/revision/cache/loco_clean_s{a.seed}_{cell}.pt",
                        map_location="cpu", weights_only=False)
@@ -113,7 +116,7 @@ def main():
         entry["uapi_former"] = e
 
         # --- learned baselines ------------------------------------------------
-        for name in MODELS:
+        for name in a.models:
             ck = f"checkpoints/baseline_{name}_s{a.seed}_{cell}{a.ckpt_tag}/best.pt"
             if not os.path.exists(ck):
                 print("missing", ck); continue
@@ -138,7 +141,6 @@ def main():
         out[cell] = entry
         print(cell, {k: (round(100 * v["S0"]["coverage"], 1), round(100 * v["S1"]["accepted_coverage"], 1),
                          round(100 * v["S1"]["refusal"], 1)) for k, v in entry.items()}, flush=True)
-    path = a.out or f"results/revision/baseline_conformal_s{a.seed}.json"
     os.makedirs(os.path.dirname(path) or ".", exist_ok=True)
     json.dump(out, open(path, "w"), indent=2)
     print("wrote", path)

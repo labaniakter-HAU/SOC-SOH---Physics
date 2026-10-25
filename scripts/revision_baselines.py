@@ -12,11 +12,17 @@ their documented channel subsets (CNN-BiLSTM: V/I/T; PI-Transformer: + IR-correc
 voltage), none of which depend on the OCV table or the Coulomb normalization, so
 the clean-LOCO feature changes do not affect them.
 
+Processes round 1: a TCN (R2.2) and a physics-informed variant of the PI-Transformer trained
+with the equivalent-circuit output-equation residual at weight 1 or 10 (R2.7), on the clean LOCO
+folds with the same rule (100 epochs, patience 15).
+
 Usage:
   py scripts/revision_baselines.py --mode random --seeds 1 2 3 4
   py scripts/revision_baselines.py --mode loco --seeds 0
+  py scripts/revision_baselines.py --mode loco --seeds 0 1 2 3 4 --models tcn pinn_l1 pinn_l10
 """
 import argparse, json, os, sys, time
+from functools import partial
 import numpy as np
 import torch
 import torch.nn.functional as F
@@ -25,12 +31,15 @@ from torch.utils.data import DataLoader
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from uapi_former.dataset import NASABatteryDataset
-from uapi_former.baselines import CNNBiLSTM, PITransformer
+from uapi_former.baselines import CNNBiLSTM, PITransformer, TCN, PhysicsResidualTransformer
 from uapi_former.ocv_fit import fit_nmc_ocv_table, n_discharge_cycles
 from train_baseline import ChannelSubsetDataset
 
 CELLS = ["B0005", "B0006", "B0007", "B0018"]
-MODELS = {"cnn_bilstm": (CNNBiLSTM, 3), "pi_transformer": (PITransformer, 4)}
+# name -> (class, loader channels); the physics variants get channel 4 (SOC from the OCV table) for the loss only
+MODELS = {"cnn_bilstm": (CNNBiLSTM, 3), "pi_transformer": (PITransformer, 4), "tcn": (TCN, 3),
+          "pinn_l1": (partial(PhysicsResidualTransformer, phys_weight=1.0), 5),
+          "pinn_l10": (partial(PhysicsResidualTransformer, phys_weight=10.0), 5)}
 
 
 def make(name, ch, seq_len=200):
@@ -74,6 +83,9 @@ def run(model, loaders, epochs, lr, dev, patience=15):
             with torch.amp.autocast(dev.type, enabled=(dev.type == "cuda")):
                 ps, ph = model(x)
                 loss = 10.0 * F.mse_loss(ps.view(-1), soc) + 2.0 * F.mse_loss(ph.view(-1), soh)
+                lam = getattr(model, "phys_weight", 0.0)
+                if lam:  # equivalent-circuit output-equation residual at every time step
+                    loss = loss + lam * F.mse_loss(model.traj.float(), x[..., -1].float())
             opt.zero_grad(); scaler.scale(loss).backward()
             scaler.unscale_(opt); torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
             scaler.step(opt); scaler.update()

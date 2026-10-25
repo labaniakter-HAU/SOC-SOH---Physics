@@ -382,6 +382,79 @@ class PITransformer(nn.Module):
         return soc, soh
 
 
+"""
+=============================================================================
+ARCHITECTURAL ASSUMPTIONS (TCN, Processes revision R2.2)
+=============================================================================
+Generic temporal convolutional network (Bai, Kolter & Koltun 2018): residual
+blocks of two dilated causal 1-D convolutions (kernel 3, dilations 1, 2, ..., 32,
+128 channels, ReLU, dropout 0.1). Receptive field 1 + 4 * 63 = 253 >= 200, so
+the last time step sees the whole window. Same raw channels as the CNN-BiLSTM
+([V_norm, I, T_norm]), same last-time-step read-out, shared FC trunk and two
+task heads; about 0.58M parameters. A local reproduction under our split.
+"""
+
+
+class _CausalBlock(nn.Module):
+    def __init__(self, c_in: int, c_out: int, dilation: int, kernel_size: int = 3, dropout: float = 0.1):
+        super().__init__()
+        self.pad = (kernel_size - 1) * dilation
+        self.c1 = nn.Conv1d(c_in, c_out, kernel_size, dilation=dilation)
+        self.c2 = nn.Conv1d(c_out, c_out, kernel_size, dilation=dilation)
+        self.drop = nn.Dropout(dropout)
+        self.skip = nn.Conv1d(c_in, c_out, 1) if c_in != c_out else nn.Identity()
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:  # (B, C, T), left padding keeps it causal
+        h = self.drop(torch.relu(self.c1(nn.functional.pad(x, (self.pad, 0)))))
+        h = self.drop(torch.relu(self.c2(nn.functional.pad(h, (self.pad, 0)))))
+        return torch.relu(h + self.skip(x))
+
+
+class TCN(nn.Module):
+    """TCN baseline for joint SOC/SOH estimation. forward(x) -> (soc_pred, soh_pred), each (B,),
+    x: (B, T, in_channels)."""
+
+    def __init__(self, in_channels: int = 3, seq_len: int = 200, channels: int = 128, levels: int = 6,
+                 kernel_size: int = 3, fc_hidden: int = 128, dropout: float = 0.1):
+        super().__init__()
+        self.seq_len = seq_len
+        self.receptive_field = 1 + 2 * (kernel_size - 1) * (2 ** levels - 1)
+        self.blocks = nn.Sequential(*[_CausalBlock(in_channels if i == 0 else channels, channels, 2 ** i,
+                                                   kernel_size, dropout) for i in range(levels)])
+        self.shared_fc = nn.Sequential(nn.Linear(channels, fc_hidden), nn.ReLU(), nn.Dropout(dropout))
+        self.soc_head = nn.Sequential(nn.Linear(fc_hidden, fc_hidden // 2), nn.ReLU(), nn.Linear(fc_hidden // 2, 1))
+        self.soh_head = nn.Sequential(nn.Linear(fc_hidden, fc_hidden // 2), nn.ReLU(), nn.Linear(fc_hidden // 2, 1))
+
+    def forward(self, x: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor]:
+        rep = self.shared_fc(self.blocks(x.transpose(1, 2))[:, :, -1])
+        return self.soc_head(rep).squeeze(-1), self.soh_head(rep).squeeze(-1)
+
+
+class PhysicsResidualTransformer(PITransformer):
+    """Physics-informed variant of the PI-Transformer (Processes revision R2.7).
+
+    Same network and inputs ([V_norm, I, T_norm, V_ocv_norm]); the loader supplies one more
+    channel, SOC_OCV,t = OCV^-1(V_t + R0|I_t|) (channel 4 of the dataset tensor, from the fold's
+    source-only OCV table), which the network never sees. In training mode the SOC head is applied
+    at every time step and scripts/revision_baselines.py adds phys_weight * MSE(SOC trajectory,
+    SOC_OCV): the residual of the equivalent-circuit output equation V_t = OCV(SOC_t) - R0|I_t|.
+    In eval mode the forward pass equals PITransformer's."""
+
+    def __init__(self, in_channels: int = 5, phys_weight: float = 1.0, **kw):
+        super().__init__(in_channels=in_channels - 1, **kw)
+        self.phys_weight = phys_weight
+        self.traj = None
+
+    def forward(self, x: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor]:
+        h = self.encoder(self.pos_enc(self.embedding(x[..., :-1])))
+        if self.training:
+            rep = self.shared_fc(h)
+            self.traj = self.soc_head(rep).squeeze(-1)  # (B, T) SOC trajectory for the physics residual
+            return self.traj[:, -1], self.soh_head(rep[:, -1]).squeeze(-1)
+        rep = self.shared_fc(h[:, -1])
+        return self.soc_head(rep).squeeze(-1), self.soh_head(rep).squeeze(-1)
+
+
 if __name__ == "__main__":
     # Quick param-count sanity check against UAPI-Former's ~1.1M budget.
     m = CNNBiLSTM()
@@ -397,3 +470,19 @@ if __name__ == "__main__":
     x2 = torch.randn(4, 200, 4)
     soc2, soh2 = m2(x2)
     print("soc:", soc2.shape, "soh:", soh2.shape)
+
+    m3 = TCN()
+    assert m3.receptive_field >= 200, m3.receptive_field
+    print(f"TCN parameters: {count_params(m3):,}, receptive field {m3.receptive_field}")
+    assert [t.shape for t in m3(x)] == [torch.Size([4])] * 2
+
+    # the physics variant is the PI-Transformer in eval mode, and exposes a SOC trajectory in training
+    m4 = PhysicsResidualTransformer(phys_weight=1.0).eval()
+    m2.load_state_dict(m4.state_dict())
+    m2.eval()
+    x4 = torch.cat([x2, torch.rand(4, 200, 1)], -1)
+    assert torch.allclose(m4(x4)[0], m2(x2)[0], atol=1e-6)
+    m4.train()
+    m4(x4)
+    assert m4.traj.shape == (4, 200)
+    print("PhysicsResidualTransformer: eval == PITransformer, trajectory", tuple(m4.traj.shape))

@@ -13,6 +13,9 @@ Levels
   loco_clean      clean LOCO models (scripts/loco_clean.py, --seed); calibration
                   = the source cells' 'cal' cycles (never trained on or used
                   for early stopping); target = the held-out cell.
+  ev              (Processes R2.1) canonical or seed checkpoint; calibration = same clean
+                  test half; target = Stanford INR21700-M50T UDDS windows (zero-shot,
+                  scripts/revision_stanford_prep.py).
 
 Every entry adds, for S0/S1/S2 and both tasks: accepted-point coverage and the
 fraction of windows that received a finite AND correct interval (R1.8).
@@ -104,7 +107,7 @@ def merge_write(key, payload):
 
 def main():
     p = argparse.ArgumentParser()
-    p.add_argument("--level", required=True, choices=["random", "cross_protocol", "chemistry", "loco_clean"])
+    p.add_argument("--level", required=True, choices=["random", "cross_protocol", "chemistry", "loco_clean", "ev"])
     p.add_argument("--seed", type=int, default=0)
     p.add_argument("--device", default="cuda" if torch.cuda.is_available() else "cpu")
     p.add_argument("--nig-seed", type=int, default=None,
@@ -114,7 +117,7 @@ def main():
     a = p.parse_args()
     dev = torch.device(a.device)
 
-    if a.level in ("random", "cross_protocol", "chemistry"):
+    if a.level in ("random", "cross_protocol", "chemistry", "ev"):
         k = a.nig_seed
         sfx = "" if k is None else f"_s{k}"
         model, meta = load_model(CANON if k is None else f"checkpoints/nasa_v12_nig_seed{k}/best.pt", dev)
@@ -136,6 +139,15 @@ def main():
                 print(cell, round(pay[cell]["soc"]["cov90"]["S0"]["coverage"], 4))
             pay["epi_thresholds"] = taus
             merge_write(f"cross_protocol{sfx}", pay)
+        elif a.level == "ev":
+            from uapi_former.dataset import StanfordM50TDataset
+            ds = StanfordM50TDataset("data/raw/stanford_m50t")
+            tgt = collect(model, mk(ds), dev, meta)
+            pay = {"zero_shot": derive(run_schemes(cal, tgt, meta, taus)), "epi_thresholds": taus,
+                   "n_windows": len(ds), "n_cycles": len({(c, q) for c, q, _ in ds.meta})}
+            save_cache(f"ev{sfx}", cal, tgt, {"tgt_cycle": np.array([f"{c}:{q}" for c, q, _ in ds.meta], dtype=object)})
+            print("ev", round(pay["zero_shot"]["soc"]["cov90"]["S0"]["coverage"], 4))
+            merge_write(f"ev_stanford{sfx}", pay)
         else:
             from uapi_former.dataset import CALCEDataset, OxfordDataset
             from uapi_former.eot import OTTransducer
